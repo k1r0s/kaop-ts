@@ -1,0 +1,99 @@
+{
+  "name": "kaop-ts",
+  "version": "0.5.0",
+  "description": "",
+  "keywords": [],
+  "main": "dist/kaop-ts.umd.js",
+  "module": "dist/kaop-ts.es5.js",
+  "typings": "dist/types/kaop-ts.d.ts",
+  "files": [
+    "dist"
+  ],
+  "author": "k1r0s <ciroreed@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/k1r0s/kaop-ts.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {
+    "lint": "tslint -e **/node_modules/** -e **/dist/** -t codeFrame **/*.ts ",
+    "prebuild": "rimraf dist",
+    "build": "tsc && rollup -c && typedoc --out dist/docs --target es6 --theme minimal src",
+    "postbuild": "rimraf compiled",
+    "start": "tsc-watch --onSuccess 'rollup -c'",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:prod": "npm run lint && npm run test -- --coverage --no-cache",
+    "deploy-docs": "node tools/gh-pages-publish.js",
+    "report-coverage": "cat ./coverage/lcov.info | coveralls",
+    "commit": "git-cz",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "prepush": "npm run test:prod && npm run build",
+    "commitmsg": "validate-commit-msg"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    },
+    "validate-commit-msg": {
+      "types": "conventional-commit-types",
+      "helpMessage": "Use \"npm run commit\" instead, we use conventional-changelog format :) (https://github.com/commitizen/cz-cli)"
+    }
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.ts$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "modulePathIgnorePatterns": [
+      "/^((?!src).)/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 85,
+        "lines": 90,
+        "statements": 90
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/jest": "^19.2.3",
+    "@types/node": "^7.0.2",
+    "colors": "^1.1.2",
+    "commitizen": "^2.9.5",
+    "coveralls": "^2.11.15",
+    "cross-env": "^5.0.0",
+    "cz-conventional-changelog": "^2.0.0",
+    "husky": "^0.13.1",
+    "jest": "^20.0.1",
+    "lodash": "^4.17.4",
+    "prompt": "^1.0.0",
+    "replace-in-file": "^2.3.2",
+    "rimraf": "^2.5.4",
+    "rollup": "^0.41.6",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "semantic-release": "^6.3.6",
+    "ts-jest": "^20.0.3",
+    "ts-node": "^3.0.4",
+    "tsc-watch": "^1.0.5",
+    "tslint": "^5.2.0",
+    "tslint-config-standard": "^5.0.2",
+    "typedoc": "^0.7.1",
+    "typescript": "^2.3.3",
+    "validate-commit-msg": "^2.10.1"
+  }
+}

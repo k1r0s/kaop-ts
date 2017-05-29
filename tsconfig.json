@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "es2015",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "isolatedModules": false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": true,
+        "declarationDir": "dist/types",
+        "noImplicitAny": false,
+        "noImplicitUseStrict": true,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "outDir": "compiled",
+        "typeRoots": [
+          "node_modules/@types"
+        ]
+    },
+    "filesGlob": [
+        "**/*.ts"
+    ],
+    "include": [
+        "src",
+        "test"
+    ],
+    "compileOnSave": true,
+    "buildOnSave": false,
+    "atom": {
+        "rewriteTsconfig": false
+    }
+}
