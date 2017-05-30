@@ -27,7 +27,7 @@ export function bootstrap(target: Object, propertyKey: string, rawMethod: () => 
         } as IMetadata
 
         new CallStackIterator(metadata)
-        return result
+        return metadata.result
     } as IFakeMethodReplacement
 
     fakeReplacement.$$raw = rawMethod
