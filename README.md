@@ -9,48 +9,51 @@
 [![dev-dependencies](https://david-dm.org/k1r0s/kaop-ts/dev-status.svg)](https://www.npmjs.com/package/kaop)
 [![downloads](https://img.shields.io/npm/dm/kaop-ts.svg)](https://www.npmjs.com/package/kaop)
 
-#### ES7 decorators to enhance your code
+#### ES7 decorators to enhance your code :wink:
 
 Bring the benefits of AOP to Javascript: https://en.wikipedia.org/wiki/Aspect-oriented_programming
 
 [Brew explanation about AOP in Javascript/TS (out date API)](https://k1r0s.github.io/aop-intro/)
 
 ```javascript
-import { afterInstance } from "kaop-ts"
+import { afterMethod } from 'kaop-ts'
 
-@afterInstance(Registry.log)
-class Car {
-  constructor (private brand, private color) {}
+class Product {
+  static price = 43.9
+
+  @afterMethod(Registry.log)
+  static applyTax(vatIncr){
+    return this.price * vatIncr
+  }
 }
 
-new Car("Renault", "blue")
+let nprice = Product.applyTax(0.18)
 // do something in the background
 ```
 
 #### set up an advice
 think about functions that can be placed before, or after method calls or class instantation that access `decorated` scope's metadata
 ```javascript
-import { AdvicePool } from "kaop-ts"
+import { AdvicePool } from 'kaop-ts'
 
 class Registry extends AdvicePool {
   static log (@adviceMetadata metadata: IMetadata) {
-    const logger = (param) => { console.log("LOGGER >> ", param) }
-    logger(`${metadata.target.name}::${metadata.propertyKey}()`)
-    logger(`called with arguments: `)
-    logger(metadata.args)
-    logger(`output a result of: `)
-    logger(metadata.result)
+    console.log(`${metadata.target.name}::${metadata.propertyKey}()`) // class and method name
+    console.log(`called with arguments: `)
+    console.log(metadata.args) // function arguments
+    console.log(`output a result of: `)
+    console.log(metadata.result) // returned value
   }
 }
 ```
 
-##### logs are the most boring example... :/
+##### logs are the most boring example... :zzz:
 
 ```javascript
 // write code for humans
 class Component extends SomeOtherComponent {
   ...
-  @beforeMethod(YourHttpService.getCached, "/url/to/html")
+  @beforeMethod(YourHttpService.getCached, '/url/to/html')
   @beforeMethod(YourHtmlParser.template)
   invalidate (parsedHtml?: any) {
     this.element.append(parsedHtml)
@@ -60,7 +63,7 @@ class Component extends SomeOtherComponent {
 componentInstance.invalidate()
 // explanation below
 ```
-What/How to previous example ?
+What/How to previous example ? :scream:
 
 - YourHttpService and YourHtmlParser have access to several services
 - `static` method getCached (aka advice) is executed within 'Component' instance as its context, so both advices will access that scope during callstack, even in asynchronous way.
@@ -76,7 +79,7 @@ What/How to previous example ?
 - Fun
 - Lightweight/Tiny
 
-[Read de API](blob/master/docs/API.md) or [Check annotated source](https://k1r0s.github.io/kaop-ts/)
+[Read de API](/docs/API.md) or [Check annotated source](https://k1r0s.github.io/kaop-ts/)
 
 Powered by TypeScript
 
