@@ -9,7 +9,6 @@ import { IMetadata } from "../interface/IMetadata"
  * be called
  */
 export class CallStackIterator {
-    private stack: IStackEntry[]
     private index: number = -1
     private proceed: boolean = true
 
@@ -19,13 +18,7 @@ export class CallStackIterator {
      * call stack
      * @param {IMetadata} metadata  current metadata for this stack
      */
-    constructor(private metadata: IMetadata) {
-        this.stack = [].concat(
-            this.metadata.fakeReplacement.$$before,
-            [null],
-            this.metadata.fakeReplacement.$$after
-        )
-
+    constructor(private metadata: IMetadata, private stack: IStackEntry[]) {
         this.next()
     }
 
@@ -36,7 +29,7 @@ export class CallStackIterator {
      * this method is responsible of invoke the main method with the correct scope
      */
     private invokeOriginal(): void {
-        this.metadata.result = this.metadata.fakeReplacement.$$raw.apply(this.metadata.scope, this.metadata.args)
+        this.metadata.result = this.metadata.rawMethod.apply(this.metadata.scope, this.metadata.args)
     }
 
     /**

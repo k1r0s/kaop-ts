@@ -1,6 +1,7 @@
 import { IClassAdviceSignature } from "./interface/IClassAdviceSignature"
 import { bootstrap } from "./core/bootstrapFn"
 import { IAdviceSignature } from "./interface/IAdviceSignature"
+import { IFakeMethodReplacement } from "./interface/IFakeMethodReplacement"
 import { IAdviceParamInjector } from "./interface/IAdviceParamInjector"
 import { IStackEntry } from "./interface/IStackEntry"
 
@@ -39,7 +40,7 @@ export function adviceParam (index: number) {
  */
 export function afterInstance (adviceFn: (...args) => void, ...args: any[]): IClassAdviceSignature {
   return function (target: any) {
-    if (!target || !target.$$raw) {
+    if (!target || !target.$$before) {
       let rawConstructor = target
       target = bootstrap(undefined, "constructor", rawConstructor)
     }
@@ -60,7 +61,7 @@ export function afterInstance (adviceFn: (...args) => void, ...args: any[]): ICl
  */
 export function afterMethod (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
   return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
-    if (!descriptor.value.$$raw) {
+    if (!descriptor.value.$$before) {
       let rawMethod = descriptor.value
       descriptor.value = bootstrap(target, propertyKey, rawMethod)
     }
@@ -81,7 +82,7 @@ export function afterMethod (adviceFn: (...args) => void, ...args: any[]): IAdvi
  */
 export function beforeInstance (adviceFn: (...args) => void, ...args: any[]): IClassAdviceSignature {
   return function (target: any) {
-    if (!target || !target.$$raw) {
+    if (!target || !target.$$before) {
       let rawConstructor = target
       target = bootstrap(undefined, "constructor", rawConstructor)
     }
@@ -102,7 +103,7 @@ export function beforeInstance (adviceFn: (...args) => void, ...args: any[]): IC
  */
 export function beforeMethod (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
   return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
-    if (!descriptor.value.$$raw) {
+    if (!descriptor.value.$$before) {
       let rawMethod = descriptor.value
       descriptor.value = bootstrap(target, propertyKey, rawMethod)
     }

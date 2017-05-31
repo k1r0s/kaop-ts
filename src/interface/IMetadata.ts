@@ -1,11 +1,9 @@
-import { IFakeMethodReplacement } from "./IFakeMethodReplacement"
-
 export interface IMetadata {
     scope: any,
     target: any,
     // target: Object | Function,
     propertyKey: string,
-    fakeReplacement: IFakeMethodReplacement,
+    rawMethod: () => any,
     args: any[],
     result: any
 }

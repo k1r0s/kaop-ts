@@ -174,7 +174,7 @@ export class Registry extends AdvicePool {
     meta.args // which contains the arguments to be received by decorated method
     meta.propertyKey // which is the name of the decorated method as string
     meta.scope // which is the instance or the context of the call stack
-    meta.fakeReplacement // the original method (contains metadata)
+    meta.rawMethod // the original method (contains metadata)
     meta.target // the class definition
     meta.result // the value to be returned to outside (aka 'return')
     ...

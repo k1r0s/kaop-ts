@@ -21,16 +21,17 @@ export function bootstrap(target: Object, propertyKey: string, rawMethod: () => 
             scope: this,
             target,
             propertyKey,
-            fakeReplacement,
+            rawMethod,
             args,
             result
         } as IMetadata
 
-        new CallStackIterator(metadata)
+        let stack = [].concat(fakeReplacement.$$before, [null], fakeReplacement.$$after)
+
+        new CallStackIterator(metadata, stack)
         return metadata.result
     } as IFakeMethodReplacement
 
-    fakeReplacement.$$raw = rawMethod
     fakeReplacement.$$before = []
     fakeReplacement.$$after = []
     return fakeReplacement
