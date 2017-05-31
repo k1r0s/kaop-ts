@@ -9,8 +9,6 @@
 
 #### ES7 decorators to enhance your code :wink:
 
-Bring the benefits of AOP to Javascript: https://en.wikipedia.org/wiki/Aspect-oriented_programming
-
 [Brew explanation about AOP in Javascript/TS (out date API)](https://k1r0s.github.io/aop-intro/)
 
 [kaop ES5 version](https://github.com/k1r0s/kaop)

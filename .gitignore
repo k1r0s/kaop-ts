@@ -6,4 +6,5 @@ coverage
 .vscode
 .idea
 /dist/
+/compiled/
 .awcache
