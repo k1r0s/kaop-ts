@@ -1,6 +1,4 @@
-# kaop-ts (Alpha)
-
-[kaop JS version](https://github.com/k1r0s/kaop)
+![kaop](http://i.imgur.com/6biEpsq.png)
 
 [![Image travis](https://travis-ci.org/k1r0s/kaop-ts.svg?branch=master)](https://travis-ci.org/k1r0s/)
 [![version](https://img.shields.io/npm/v/kaop-ts.svg)](https://www.npmjs.com/package/kaop-ts/)
@@ -15,16 +13,7 @@ Bring the benefits of AOP to Javascript: https://en.wikipedia.org/wiki/Aspect-or
 
 [Brew explanation about AOP in Javascript/TS (out date API)](https://k1r0s.github.io/aop-intro/)
 
-## **kaop-ts docs**
-
-- :zap:           [Get started](#get-started)
-- :eyeglasses:    [Examples](#examples)
-- :books:         [Decorators](#decorators)
-- :scissors:      [Available join points](#available-join-points)
-- :mag_right:     [Inside an advice](#inside-an-advice)
-- :cyclone:       [Async operations](#async-operations) (todo, quite covered in previous chapter)
-- :bulb:          [Tips](#tips)
-- :sunglasses:    [Desmitifing AOP](#desmitifing-aop) (todo)
+[kaop ES5 version](https://github.com/k1r0s/kaop)
 
 #### features
 
@@ -38,6 +27,16 @@ Bring the benefits of AOP to Javascript: https://en.wikipedia.org/wiki/Aspect-or
 
 https://github.com/alexjoverm/typescript-library-starter/ <- **u rly need this**
 
+## **docs**
+
+- :zap:           [Get started](#get-started)
+- :eyeglasses:    [Examples](#examples)
+- :books:         [Decorators](#decorators)
+- :scissors:      [Available join points](#available-join-points)
+- :mag_right:     [Inside an advice](#inside-an-advice)
+- :cyclone:       [Async operations](#async-operations) (todo, quite covered in previous chapter)
+- :bulb:          [Tips](#tips)
+- :sunglasses:    [Desmitifing AOP](#desmitifing-aop) (todo)
 -----
 
 #### Get Started
@@ -333,7 +332,5 @@ class View {
 > You should not perform async calls during `beforeInstance` hooks becuase you will mess up instantation of that class.
 
 > Also if you're using some framework that require you to implement a function that return some value, let's say `render` method of React component. It is not a good idea place an async decorator before that method. Because `render` method will be evaluated as `undefined` messing up React rendering.
-
-[Read de API](/docs/API.md) or [Check annotated source](https://k1r0s.github.io/kaop-ts/)
 
 Powered by TypeScript
