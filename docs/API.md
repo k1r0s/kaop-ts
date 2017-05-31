@@ -143,9 +143,100 @@ This library allows (nowadays) to cut and inject code in four Join points:
 @beforeInstance // class decorator
 
 ```
-Some contexts or metadata may be accesible in several cases. For example: trying to modify method arguments at `after` join point doesn't have any sense. *Maybe for comunication purposes between advices*.
 
-You should not perform async calls during `beforeInstance` hooks becuase you will mess up instantation of that class.
+These decorators may receive an `advice` as first param, you may place more arguments so they can be retrieved as arguments. Think about the same advice but you may need specific options in some cases.
+
+#### Inside an advice
+
+To create an advice you should simply create a class that inherits from `AdvicePool` an then create a static method in it. This is because advices need to have access to two protected methods: `next` and `stop` in order to obtain flow control during stack.
+
+```Javascript
+import { AdvicePool } from 'kaop-ts'
+
+export class PersistanceAdvices extends AdvicePool {
+  static save () {
+    ...
+    this.next()
+  }
+}
+
+```
+`this.next` needs to be called if declared in order to execute the next advice or method.
+
+if `this.next` its not declared then advice will be considered as **synchronous** meaning that at the end of the function it will be called anyway.
+
+The example below is completely valid, next advice or call will be executed as if `this.next` was declared at the bottom of function body. You can declare multiple advices in the same method without.
+
+```Javascript
+import { AdvicePool } from 'kaop-ts'
+
+export class PersistanceAdvices extends AdvicePool {
+  static save () {
+    ...
+    ...
+  }
+}
+```
+But if you need perform async tasks, for example dealing with persistence layer before executing some method... having the following code:
+
+```Javascript
+import { beforeMethod } from 'kaop-ts'
+import { PersistanceAdvices } from './somewhere'
+import { Flow } from './somewhere'
+import { OrderModel } from './somewhere'
+
+class View {
+
+  @beforeMethod(PersistanceAdvices.read, OrderModel)
+  @beforeMethod(Flow.validate)
+  update (data?) {
+    ...
+    ...
+  }
+}
+
+...
+
+viewInstance.update() // trigger advice stack
+
+```
+So in this example `update` method has 2 advices, the first one is asynchronous. So the second one needs to be called right after `read` has finished. But `validate` shouldn't care about that. Because it could be inserted in many contexts and should behave always in the same way.
+
+Let's take a look over `read` advice:
+
+```Javascript
+import { AdvicePoolm, adviceMetadata, adviceParam } from 'kaop-ts'
+import { Service } from './somewhere'
+import { ICommonModel } from './somewhere'
+
+export class PersistanceAdvices extends AdvicePool {
+  static read (@adviceMetadata meta, @adviceParam(0) model: ICommonModel) {
+    Service.get(model.url)
+    .then(data => meta.args.push(data))
+    .then(this.next)
+  }
+}
+```
+So `read` advice assumes that first advice parameter is a model (that extends or may have a structure like `ICommonModel`) should have a property named url which contains the location in order to perform a request or what ever (let's say some call that cannot be tracked as synchronous code) so this is what we need `this.next`, because the next step in the call stack which in this case is `validate` advice need to be invoked when data is available. If we remove the last line of the body `validate` advice will be called immediately messing up everything.
+
+You may effectively wonder that methods decorated with async advices wouldn't return anything but `undefined`.
+
+Async calls can be executed after main method execution, for example placing an http request after user performs some action and has been handled:
+
+```Javascript
+import { beforeMethod } from 'kaop-ts'
+import { Registry } from './somewhere'
+
+class View {
+
+  @afterMethod(Registry.saveInteraction)
+  clickSomewhere () {
+    ...
+  }
+}
+```
+
+
 
 #### Tips
 
@@ -156,3 +247,9 @@ You should not perform async calls during `beforeInstance` hooks becuase you wil
 > An advice is declared as `async` if contains `this.next` expression within. If this expression is declared but never called you messed up the stack.
 
 > You can prevent main method execution by calling `this.stop`. This expression will avoid the decorated method to be executed. Useful when handling exceptions..
+
+> Some contexts or metadata may be accesible in several cases. For example: trying to modify method arguments at `after` join point doesn't have any sense. *Maybe for comunication purposes between advices*.
+
+> You should not perform async calls during `beforeInstance` hooks becuase you will mess up instantation of that class.
+
+> Also if you're using some framework that require you to implement a function that return some value, let's say `render` method of React component. It is not a good idea place an async decorator before that method. Because `render` method will be evaluated as `undefined` messing up React rendering.
