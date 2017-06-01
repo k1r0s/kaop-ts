@@ -14,25 +14,33 @@ import { IFakeMethodReplacement } from "../interface/IFakeMethodReplacement"
  */
 export function bootstrap (target: Object, propertyKey: string, rawMethod: () => any, result?: any): IFakeMethodReplacement {
 
+  // this function replaces main decorated method
   const fakeReplacement = function (...args: any[]): any {
 
+    // here we receive almost every needed metadata property
     const metadata = {
-      scope: this,
-      target,
-      propertyKey,
-      rawMethod,
-      args,
-      result
+      scope: this, // method context which could be the instance or the static context
+      target, // class of decorated method
+      propertyKey, // property name of decorated method
+      rawMethod, // original method
+      args, // method arguments
+      result // method returned value
     } as IMetadata
 
+    // concat before and after stacks
     let stack = [].concat(fakeReplacement.$$before, [null], fakeReplacement.$$after)
 
     /* tslint:disable-next-line */
+
+    // creates an instance which recursively will drive over advices or methods
+    // calling this.next (CallStackIterator method)
     new CallStackIterator(metadata, stack, fakeReplacement.$$error)
     return metadata.result
   } as IFakeMethodReplacement
 
+  // initialize stores in returned function
   fakeReplacement.$$before = []
   fakeReplacement.$$after = []
+  fakeReplacement.$$error = null
   return fakeReplacement
 }

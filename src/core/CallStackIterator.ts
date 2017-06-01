@@ -26,34 +26,40 @@ export class CallStackIterator {
      * or calling the main method
      */
   next () {
+
+    // increment index used to retrieve following entry
     this.index++
 
+    // asign currentEntry to the following entry
     let currentEntry = this.stack[this.index]
 
-    if (currentEntry === undefined) {
-      return
-    }
-
+    // currentEntry evals to 'null' meaning that the next entry is invoke main method.
+    // but it will be skipped if 'this.proceed' evals to 'false' (this.stop was invoked)
     if (this.proceed && currentEntry === null) {
+      // we need to know if user want to track exceptions
       if (!this.exceptionEntry) {
+        // execute main method as normal
         this.invokeOriginal()
         this.next()
-        return
       } else {
+        // execute main method with try catch block
         try {
           this.invokeOriginal()
+          // note that this call could be skipped
           this.next()
         } catch (err) {
+          // if there was an exception we need to store that reference
           this.metadata.exception = err
+          // execute advice
           this.executeAdvice(this.exceptionEntry)
-          return
         }
       }
     }
 
+    // if currentEntry has a value, it must be an entry/advice descriptor
     if (currentEntry) {
+      // execute advice
       this.executeAdvice(currentEntry)
-      return
     }
   }
 
@@ -95,12 +101,18 @@ export class CallStackIterator {
 
     let transformedArguments = []
 
+
+    // if stackEntry.advice.$$params evals is an Array means that the user
+    // implemented @adviceParams
     if (stackEntry.advice.$$params instanceof Array) {
       stackEntry.advice.$$params.forEach((requestedArgIndex, index) => {
         transformedArguments[index] = stackEntry.args[requestedArgIndex]
       })
     }
 
+    // if stackEntry.advice.$$meta evals is an Array means that the user
+    // implemented @adviceMetadata, so we need to know which index user wants to
+    // be placed metadata argument
     if (typeof stackEntry.advice.$$meta === "number") {
       transformedArguments[stackEntry.advice.$$meta] = this.metadata
     }

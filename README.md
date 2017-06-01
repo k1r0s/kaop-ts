@@ -98,9 +98,13 @@ class Registry extends AdvicePool {
 Most of the examples below includes JS version of this lib. If you have any other example please PR this!
 
 [Logs in Angular2, current version](https://stackoverflow.com/questions/39407298/how-to-implement-aop-in-angular-2/44290042#44290042)
+
 [nodejs controller ES5 kaop](https://github.com/k1r0s/asv-pokedex/blob/master/server/Controller.js#L62)
+
 [hackernoon article, outdate api](https://hackernoon.com/aspect-oriented-programming-in-javascript-es5-typescript-d751dda576d0)
+
 [angularjs include fork ES5 kaop](https://github.com/k1r0s/kir/blob/master/src/tag/k-include.js#L10)
+
 [logger in sqlite adapter ES5 kaop](https://github.com/k1r0s/korm/blob/master/src/adapter/sqlite.js#L43)
 
 logs are the most boring example... :zzz:
@@ -121,11 +125,11 @@ componentInstance.invalidate()
 ```
 What/How to previous example ? :scream:
 
-- YourHttpService and YourHtmlParser have access to several services
+- YourHttpService and YourHtmlParser have access to several services.
 - `static` method getCached (aka advice) is executed within 'Component' instance as its context, so both advices will access that scope during callstack, even in asynchronous way.
-- `getCached` performs a request to "/url/to/html", on success it **places the result as the first parameter** in the call stack, then delegates to the next advice or method
-- `template` only cares about take the **first parameter** which usually is (or has to be) an string that has to be parsed with a given context (like EJS). It replaces first parameter again and then delegates to the next advice or method
-- there is not advices to be executed so main method `invalidate` is invoked, but now it has a parameter which has been processed but *code is beautiful and readable*
+- Advice `getCached` performs a request to "/url/to/html", on success it **places the result as the first parameter** in the call stack, then delegates to the next advice or method.
+- In the next advice, `template` only cares about take the **first parameter** which usually is (or has to be) an string that has to be parsed with a given context (like EJS). It replaces first parameter again and then delegates to the next advice or method.
+- There is not advices left to be executed so main method `invalidate` is invoked, but now it has a parameter which has been processed but *code is beautiful and readable*.
 
 
 #### Decorators
@@ -140,6 +144,7 @@ This library includes 6 decorators and the building blocks to implement yours.
 @beforeMethod // join point
 @afterInstance // join point
 @beforeInstance // join point
+@onException // composed join point
 @adviceMetadata // used to retrieve target context
 @adviceParam // used to retrieve advice params
 ```
@@ -218,6 +223,8 @@ This library allows (nowadays) to cut and inject code in four Join points:
 @beforeMethod // method decorator
 @afterInstance // class decorator
 @beforeInstance // class decorator
+
+@onException // method decorator
 
 ```
 

@@ -114,20 +114,27 @@ export function beforeMethod (adviceFn: (...args) => void, ...args: any[]): IAdv
   }
 }
 
+
 /**
- * Triggers an aspect when an exception occurs
+ * @function onException - this decorator function places the `adviceFn` as a
+ * handler for any exception triggered by decorated method 
+ *
+ * @param  {Function}         adviceFn advice function
+ * @param  {Array}            args advice arguments
+ * @return {IAdviceSignature} wrapped method reference
  */
 export function onException (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
   return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
     // If descriptor hasn't been initializated
-    if (!descriptor.value.$$error) {
+    if (!descriptor.value.$$before) {
       let rawMethod = descriptor.value
+      // descriptor is initializated, method is wrapped
       descriptor.value = bootstrap(target, propertyKey, rawMethod)
     }
     const advice = adviceFn as IAdviceParamInjector
     const stackEntry: IStackEntry = { advice, args }
 
-    // Place it at the end of the $$before stack
+    // Place it on $$error placeholder which will be checked later
     descriptor.value.$$error = stackEntry
     return descriptor
   }
