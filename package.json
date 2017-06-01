@@ -1,6 +1,6 @@
 {
   "name": "kaop-ts",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "",
   "keywords": [],
   "main": "dist/kaop-ts.umd.js",
