@@ -17,7 +17,7 @@ export class CallStackIterator {
      * call stack
      * @param {IMetadata} metadata  current metadata for this stack
      */
-  constructor (private metadata: IMetadata, private stack: IStackEntry[]) {
+  constructor (private metadata: IMetadata, private stack: IStackEntry[], private exceptionEntry?: IStackEntry) {
     this.next()
   }
 
@@ -25,37 +25,34 @@ export class CallStackIterator {
      * next - this method will resolve by calling the next advice in the call stack
      * or calling the main method
      */
-  next () {
+  next() {
     this.index++
 
     let currentEntry = this.stack[this.index]
 
-    if (currentEntry === undefined) {
+    if(currentEntry === undefined) {
       return
     }
 
-    if (this.proceed && currentEntry === null) {
-      this.invokeOriginal()
-      this.next()
-      return
-    }
-
-    if (currentEntry) {
-      if (currentEntry.advice.$$exception) {
-        try {
-          this.stop()
-          this.invokeOriginal()
-        } catch (e) {
-          currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
-        }
-      } else {
-        currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
-      }
-
-      if (!this.isAsync(currentEntry.advice)) {
+    if(this.proceed && currentEntry === null) {
+      if(!this.exceptionEntry) {
+        this.invokeOriginal()
         this.next()
+        return
+      } else {
+        try {
+          this.invokeOriginal()
+          this.next()
+        } catch (err) {
+          this.metadata.exception = err
+          this.executeAdvice(this.exceptionEntry)
+          return
+        }
       }
+    }
 
+    if(currentEntry) {
+      this.executeAdvice(currentEntry)
       return
     }
   }
@@ -66,6 +63,13 @@ export class CallStackIterator {
      */
   stop () {
     this.proceed = false
+  }
+
+  private executeAdvice (currentEntry: IStackEntry) {
+    currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
+    if(!this.isAsync(currentEntry.advice)) {
+        this.next()
+    }
   }
 
     /**
