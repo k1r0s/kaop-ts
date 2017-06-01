@@ -128,7 +128,7 @@ export function onException (adviceFn: (...args) => void, ...args: any[]): IAdvi
     const stackEntry: IStackEntry = { advice, args }
 
     // Place it at the end of the $$before stack
-    descriptor.value.$$error.push(stackEntry)
+    descriptor.value.$$error = stackEntry
     return descriptor
   }
 }
