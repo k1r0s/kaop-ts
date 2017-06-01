@@ -1,3 +1,3 @@
 export interface IClassAdviceSignature {
-    (target: Object)
+  (target: Object)
 }

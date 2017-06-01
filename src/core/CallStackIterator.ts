@@ -1,7 +1,6 @@
 import { IStackEntry } from "../interface/IStackEntry"
 import { IMetadata } from "../interface/IMetadata"
 
-
 /**
  * {class} CallStackIterator
  * this class contains all accessible references within the advice call stack and
@@ -9,8 +8,8 @@ import { IMetadata } from "../interface/IMetadata"
  * be called
  */
 export class CallStackIterator {
-    private index: number = -1
-    private proceed: boolean = true
+  private index: number = -1
+  private proceed: boolean = true
 
     /**
      * {constructor}
@@ -18,19 +17,54 @@ export class CallStackIterator {
      * call stack
      * @param {IMetadata} metadata  current metadata for this stack
      */
-    constructor(private metadata: IMetadata, private stack: IStackEntry[]) {
-        this.next()
+  constructor (private metadata: IMetadata, private stack: IStackEntry[]) {
+    this.next()
+  }
+
+    /**
+     * next - this method will resolve by calling the next advice in the call stack
+     * or calling the main method
+     */
+  next () {
+    this.index++
+
+    let currentEntry = this.stack[this.index]
+
+    if (currentEntry === undefined) {
+      return
     }
 
+    if (this.proceed && currentEntry === null) {
+      this.invokeOriginal()
+      this.next()
+      return
+    }
+
+    if (currentEntry) {
+      currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
+      if (!this.isAsync(currentEntry.advice)) {
+        this.next()
+      }
+      return
+    }
+  }
+
+    /**
+     * stop - this method will alter proceed property of this stack which will
+     * prevent main method to be invoked
+     */
+  stop () {
+    this.proceed = false
+  }
 
     /**
      * @private invokeOriginal
      *
      * this method is responsible of invoke the main method with the correct scope
      */
-    private invokeOriginal(): void {
-        this.metadata.result = this.metadata.rawMethod.apply(this.metadata.scope, this.metadata.args)
-    }
+  private invokeOriginal (): void {
+    this.metadata.result = this.metadata.rawMethod.apply(this.metadata.scope, this.metadata.args)
+  }
 
     /**
      * @private transformArguments
@@ -42,59 +76,22 @@ export class CallStackIterator {
      *
      * @return {Array} shorted arguments
      */
-    private transformArguments(stackEntry: IStackEntry): any[] {
+  private transformArguments (stackEntry: IStackEntry): any[] {
 
-        let transformedArguments = []
+    let transformedArguments = []
 
-        if(stackEntry.advice.$$params instanceof Array) {
-            stackEntry.advice.$$params.forEach((requestedArgIndex, index) => {
-                transformedArguments[index] = stackEntry.args[requestedArgIndex]
-            })
-        }
-
-        if(typeof stackEntry.advice.$$meta === "number") {
-            transformedArguments[stackEntry.advice.$$meta] = this.metadata
-        }
-
-        return transformedArguments
+    if (stackEntry.advice.$$params instanceof Array) {
+      stackEntry.advice.$$params.forEach((requestedArgIndex, index) => {
+        transformedArguments[index] = stackEntry.args[requestedArgIndex]
+      })
     }
 
-
-    /**
-     * next - this method will resolve by calling the next advice in the call stack
-     * or calling the main method
-     */
-    next() {
-        this.index++
-
-        let currentEntry = this.stack[this.index]
-
-        if(currentEntry === undefined) {
-            return
-        }
-
-        if(this.proceed && currentEntry === null) {
-            this.invokeOriginal()
-            this.next()
-            return
-        }
-
-        if(currentEntry) {
-            currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
-            if(!this.isAsync(currentEntry.advice)) {
-                this.next()
-            }
-            return
-        }
+    if (typeof stackEntry.advice.$$meta === "number") {
+      transformedArguments[stackEntry.advice.$$meta] = this.metadata
     }
 
-    /**
-     * stop - this method will alter proceed property of this stack which will
-     * prevent main method to be invoked
-     */
-    stop() {
-        this.proceed = false
-    }
+    return transformedArguments
+  }
 
     /**
      * @private isAsync
@@ -106,9 +103,9 @@ export class CallStackIterator {
      *
      * @return {boolean}
      */
-    private isAsync(rawAdvice: Function): boolean {
-        return !!rawAdvice
+  private isAsync (rawAdvice: Function): boolean {
+    return !!rawAdvice
         .toString()
         .match(/[^a-zA-Z$]this\.next[^a-zA-Z_$0-9]/g)
-    }
+  }
 }

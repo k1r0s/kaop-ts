@@ -1,4 +1,4 @@
 export interface IStackMetadata {
-    name: string
-    scope: any
+  name: string
+  scope: any
 }
