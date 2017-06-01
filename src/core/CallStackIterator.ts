@@ -101,7 +101,6 @@ export class CallStackIterator {
 
     let transformedArguments = []
 
-
     // if stackEntry.advice.$$params evals is an Array means that the user
     // implemented @adviceParams
     if (stackEntry.advice.$$params instanceof Array) {

@@ -30,10 +30,9 @@ export function bootstrap (target: Object, propertyKey: string, rawMethod: () =>
     // concat before and after stacks
     let stack = [].concat(fakeReplacement.$$before, [null], fakeReplacement.$$after)
 
-    /* tslint:disable-next-line */
-
     // creates an instance which recursively will drive over advices or methods
     // calling this.next (CallStackIterator method)
+    /* tslint:disable-next-line */
     new CallStackIterator(metadata, stack, fakeReplacement.$$error)
     return metadata.result
   } as IFakeMethodReplacement
