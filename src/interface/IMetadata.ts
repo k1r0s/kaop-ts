@@ -3,6 +3,7 @@ export interface IMetadata {
   target: any,
     // target: Object | Function,
   propertyKey: string,
+  exception: Error,
   rawMethod: () => any,
   args: any[],
   result: any
