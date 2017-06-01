@@ -2,7 +2,7 @@ import { AdvicePool, IMetadata, afterMethod, adviceMetadata, adviceParam } from 
 
 class AnotherAdvicePool extends AdvicePool {
 
-  static logMethod( @adviceMetadata metadata: IMetadata) {
+  static logMethod ( @adviceMetadata metadata: IMetadata) {
     const logger = (param) => { console.log("LOGGER >> ", param) }
     logger(`${metadata.target.name}::${metadata.propertyKey}() called with arguments: `)
     logger(metadata.args)
@@ -14,12 +14,12 @@ class AnotherAdvicePool extends AdvicePool {
 class AnotherDummyTest {
 
   @afterMethod(AnotherAdvicePool.logMethod)
-  static someMethod(param0: string, param1: number): any {
+  static someMethod (param0: string, param1: number): any {
     return param0 + param1
   }
 
   @afterMethod(AnotherAdvicePool.logMethod)
-  static anotherMethod(param0: number, param1: any): any {
+  static anotherMethod (param0: number, param1: any): any {
     return param0 + param1
   }
 }

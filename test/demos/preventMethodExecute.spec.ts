@@ -3,7 +3,7 @@ import { AdvicePool, IMetadata, beforeMethod, adviceMetadata, adviceParam } from
 class MyServiceAdvice extends AdvicePool {
   static checkIfSomeCondition (@adviceMetadata meta: IMetadata) {
     console.log("advice execution")
-    if(meta.args[1]){
+    if (meta.args[1]) {
       this.stop()
     }
   }

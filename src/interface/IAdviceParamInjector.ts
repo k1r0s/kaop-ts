@@ -1,5 +1,5 @@
 export interface IAdviceParamInjector {
-    (): any
-    $$meta: number
-    $$params: number[]
+  (): any
+  $$meta: number
+  $$params: number[]
 }
