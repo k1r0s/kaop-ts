@@ -7,6 +7,5 @@ export {
   adviceParam,
   afterInstance,
   beforeInstance,
-  beforeMethod,
-  onException
+  beforeMethod
 } from "./decorators"
