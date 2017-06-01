@@ -7,10 +7,12 @@ describe("kaop-ts demo -> onException join point", () => {
   let methodSpy = jest.fn()
 
   let orderArr = []
+  let capturedException = null
 
   class MyAdvicePool extends AdvicePool {
     static handleException (@adviceMetadata meta: IMetadata, @adviceParam(0) order) {
       orderArr.push(order)
+      capturedException = meta.exception
       exceptionSpy()
     }
 
@@ -46,6 +48,7 @@ describe("kaop-ts demo -> onException join point", () => {
     ExceptionTest.wrongMethod(2)
     ExceptionTest.wrongMethod(methodSpy)
 
+    expect(capturedException instanceof Error).toBe(true)
     expect(exceptionSpy).toHaveBeenCalledTimes(1)
     expect(methodSpy).toHaveBeenCalledTimes(1)
   })
