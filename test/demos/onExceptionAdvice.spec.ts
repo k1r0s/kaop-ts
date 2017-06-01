@@ -1,28 +1,71 @@
-import { AdvicePool, IMetadata, beforeMethod, adviceMetadata } from "../../src/kaop-ts"
+import { AdvicePool, IMetadata, beforeMethod, adviceMetadata, adviceParam, onException } from "../../src/kaop-ts"
 
-class MyAdvicePool extends AdvicePool {
-  static onException (@adviceMetadata meta: IMetadata) {
-    this.stop()
-    try {
-      meta.result = meta.rawMethod.apply(meta.scope, meta.args)
-    } catch (err) {
-      console.log(`There was an error in ${meta.propertyKey}(): -> ${err.message}`)
+describe("kaop-ts demo -> onException join point", () => {
+
+  let exceptionSpy = jest.fn()
+  let noopSpy = jest.fn()
+  let methodSpy = jest.fn()
+
+  let orderArr = []
+  let capturedException = null
+
+  class MyAdvicePool extends AdvicePool {
+    static handleException (@adviceMetadata meta: IMetadata, @adviceParam(0) order) {
+      orderArr.push(order)
+      capturedException = meta.exception
+      exceptionSpy()
+    }
+
+    static noop (@adviceParam(0) order) {
+      orderArr.push(order)
+      noopSpy()
     }
   }
-}
 
-class ExceptionTest {
+  class ExceptionTest {
 
-  @beforeMethod(MyAdvicePool.onException)
-  // static wrongMethod (callback: number | Function) {
-  static wrongMethod (callback: any) {
-    callback()
+    @onException(MyAdvicePool.handleException)
+    static wrongMethod (callback: any) {
+      callback()
+    }
+
+    @beforeMethod(MyAdvicePool.noop, 0)
+    @onException(MyAdvicePool.handleException, 1)
+    @beforeMethod(MyAdvicePool.noop, 2)
+    static orderTest (cb: any) {
+      cb()
+    }
   }
-}
 
-describe("kaop-ts demo -> exception join point", () => {
-  it("advices are callback driven, advice stack will be executed when this.next is invoked", (done) => {
+  beforeEach(() => {
+    exceptionSpy.mockClear()
+    methodSpy.mockClear()
+    noopSpy.mockClear()
+    orderArr = []
+  })
+
+  it("throws an exception and thus calls MyAdvicePool.handleException", () => {
     ExceptionTest.wrongMethod(2)
-    ExceptionTest.wrongMethod(done)
+    ExceptionTest.wrongMethod(methodSpy)
+
+    expect(capturedException instanceof Error).toBe(true)
+    expect(exceptionSpy).toHaveBeenCalledTimes(1)
+    expect(methodSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("onException must be called after the last beforeMethod, regardless of the order", () => {
+    ExceptionTest.orderTest(4)
+    expect(orderArr).toEqual([0, 2, 1])
+  })
+
+  it("prevents the original function from triggering twice", () => {
+    ExceptionTest.orderTest(() => {
+      methodSpy()
+      throw Error()
+    })
+
+    expect(noopSpy).toHaveBeenCalledTimes(2)
+    expect(exceptionSpy).toHaveBeenCalledTimes(1)
+    expect(methodSpy).toHaveBeenCalledTimes(1)
   })
 })
