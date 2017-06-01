@@ -113,3 +113,23 @@ export function beforeMethod (adviceFn: (...args) => void, ...args: any[]): IAdv
     return descriptor
   }
 }
+
+/**
+ * Triggers an aspect when an exception occurs
+ */
+export function onException (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
+  return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
+    // If descriptor hasn't been initializated
+    if (!descriptor.value.$$before) {
+      let rawMethod = descriptor.value
+      descriptor.value = bootstrap(target, propertyKey, rawMethod)
+    }
+    const advice = adviceFn as IAdviceParamInjector
+    advice.$$exception = true
+    const stackEntry: IStackEntry = { advice, args }
+
+    // Place it at the end of the $$before stack
+    descriptor.value.$$before.push(stackEntry)
+    return descriptor
+  }
+}

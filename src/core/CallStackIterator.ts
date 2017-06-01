@@ -41,10 +41,21 @@ export class CallStackIterator {
     }
 
     if (currentEntry) {
-      currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
+      if (currentEntry.advice.$$exception) {
+        try {
+          this.stop()
+          this.invokeOriginal()
+        } catch (e) {
+          currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
+        }
+      } else {
+        currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
+      }
+
       if (!this.isAsync(currentEntry.advice)) {
         this.next()
       }
+
       return
     }
   }
