@@ -25,17 +25,17 @@ export class CallStackIterator {
      * next - this method will resolve by calling the next advice in the call stack
      * or calling the main method
      */
-  next() {
+  next () {
     this.index++
 
     let currentEntry = this.stack[this.index]
 
-    if(currentEntry === undefined) {
+    if (currentEntry === undefined) {
       return
     }
 
-    if(this.proceed && currentEntry === null) {
-      if(!this.exceptionEntry) {
+    if (this.proceed && currentEntry === null) {
+      if (!this.exceptionEntry) {
         this.invokeOriginal()
         this.next()
         return
@@ -51,7 +51,7 @@ export class CallStackIterator {
       }
     }
 
-    if(currentEntry) {
+    if (currentEntry) {
       this.executeAdvice(currentEntry)
       return
     }
@@ -67,8 +67,8 @@ export class CallStackIterator {
 
   private executeAdvice (currentEntry: IStackEntry) {
     currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
-    if(!this.isAsync(currentEntry.advice)) {
-        this.next()
+    if (!this.isAsync(currentEntry.advice)) {
+      this.next()
     }
   }
 
