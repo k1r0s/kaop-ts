@@ -120,16 +120,15 @@ export function beforeMethod (adviceFn: (...args) => void, ...args: any[]): IAdv
 export function onException (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
   return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
     // If descriptor hasn't been initializated
-    if (!descriptor.value.$$before) {
+    if (!descriptor.value.$$error) {
       let rawMethod = descriptor.value
       descriptor.value = bootstrap(target, propertyKey, rawMethod)
     }
     const advice = adviceFn as IAdviceParamInjector
-    advice.$$exception = true
     const stackEntry: IStackEntry = { advice, args }
 
     // Place it at the end of the $$before stack
-    descriptor.value.$$before.push(stackEntry)
+    descriptor.value.$$error.push(stackEntry)
     return descriptor
   }
 }
