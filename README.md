@@ -35,6 +35,7 @@ https://github.com/alexjoverm/typescript-library-starter/ <- **u rly need this**
 - :mag_right:     [Inside an advice](#inside-an-advice)
 - :cyclone:       [Async operations](#async-operations) (todo, quite covered in previous chapter)
 - :bulb:          [Tips](#tips)
+- :punch:         [Troubleshooting](#troubleshooting)
 - :sunglasses:    [Desmitifing AOP](#desmitifing-aop) (todo)
 -----
 
@@ -321,7 +322,14 @@ class View {
 }
 ```
 
+#### Troubleshooting
 
+`___ was not found in 'kaop-ts'`
+
+![angular warning](http://i.imgur.com/kBg020O.png)
+
+Great explanation by @alexjoverm about warnings while compiling with webpack (`ng` cli tools) typically angular users
+https://github.com/k1r0s/kaop-ts/issues/5
 
 #### Tips
 
