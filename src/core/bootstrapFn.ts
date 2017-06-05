@@ -12,7 +12,7 @@ import { IFakeMethodReplacement } from "../interface/IFakeMethodReplacement"
  * @param  {Function}               rawMethod         decorated method reference
  * @return {IFakeMethodReplacement}                   description
  */
-export function bootstrap (target: Object, propertyKey: string, rawMethod: () => any, result?: any): IFakeMethodReplacement {
+export function bootstrap (target: Object, propertyKey: string, rawMethod: (...args: any[]) => any, result?: any): IFakeMethodReplacement {
 
   // this function replaces main decorated method
   const fakeReplacement = function (...args: any[]): any {
