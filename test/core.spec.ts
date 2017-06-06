@@ -85,6 +85,7 @@ describe("CallStackIterator contains many functions so call 'advices' which can 
     expect(fakeMetadata.result).toMatch(/Peter/)
     expect(fakeMetadata.scope.name).toMatch(/Peter/)
   })
+  
   it("perform an async stack with 2 delays sequentially", (done) => {
     let callback = () => {
 
@@ -127,5 +128,19 @@ describe("CallStackIterator contains many functions so call 'advices' which can 
 
     expect(fakeMetadata.result).toBeUndefined()
     expect(methodSpy).toHaveBeenCalledTimes(0)
+  })
+
+  it("CallStackIterator thirt param is used to set exception handler advice", () => {
+    let exceptionSpy = jest.fn()
+    fakeMetadata.rawMethod = function (name) { return this.name() }
+    let aParamInjector = function(meta){
+      exceptionSpy()
+      expect(meta.exception).toBeInstanceOf(Error)
+    } as IAdviceParamInjector
+    aParamInjector.$$meta = 0
+    new CallStackIterator(fakeMetadata, [null], {advice: aParamInjector, args: []} as IStackEntry)
+
+    expect(fakeMetadata.result).toBeUndefined()
+    expect(exceptionSpy).toHaveBeenCalledTimes(1)
   })
 })
