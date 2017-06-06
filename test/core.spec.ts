@@ -85,6 +85,47 @@ describe("CallStackIterator contains many functions so call 'advices' which can 
     expect(fakeMetadata.result).toMatch(/Peter/)
     expect(fakeMetadata.scope.name).toMatch(/Peter/)
   })
+  it("perform an async stack with 2 delays sequentially", (done) => {
+    let callback = () => {
 
+      expect(methodSpy).toHaveBeenCalledTimes(1)
+      expect(adviceSpy).toHaveBeenCalledTimes(2)
+      expect(fakeMetadata.scope.name).toMatch(/PetersomeFakeString/)
+      expect(fakeMetadata.result).toBeUndefined()
+      done()
+    }
 
+    let methodSpy = jest.fn()
+    let adviceSpy = jest.fn()
+    fakeMetadata.rawMethod = function (name, another, cbk) { methodSpy(); this.name = name + another; cbk(); }
+    let aParamInjector = function(meta){ adviceSpy(); setTimeout(_ => { meta.args.push("someFakeString"); this.next() }, 50) } as IAdviceParamInjector
+    let bParamInjector = function(meta){ adviceSpy(); setTimeout(_ => { meta.args.push(callback); this.next() }, 50) } as IAdviceParamInjector
+    aParamInjector.$$meta = 0
+    bParamInjector.$$meta = 0
+    let fakeStack = [
+      {advice: aParamInjector, args: []} as IStackEntry,
+      {advice: bParamInjector, args: []} as IStackEntry,
+      null]
+
+    new CallStackIterator(fakeMetadata, fakeStack)
+  })
+
+  it("advices accept parameters to change their behavior", () => {
+    let methodSpy = jest.fn()
+    fakeMetadata.rawMethod = function (name) { methodSpy(); return this.name = name }
+    let aParamInjector = function(meta, param){
+      expect(meta).toBeUndefined()
+      expect(param).toBeDefined()
+      expect(param).toBeGreaterThan(2)
+
+      this.stop()
+    } as IAdviceParamInjector
+    aParamInjector.$$params = [undefined, 0]
+    let fakeStack = [{advice: aParamInjector, args: [3]} as IStackEntry, null]
+
+    new CallStackIterator(fakeMetadata, fakeStack)
+
+    expect(fakeMetadata.result).toBeUndefined()
+    expect(methodSpy).toHaveBeenCalledTimes(0)
+  })
 })
