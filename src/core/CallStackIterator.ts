@@ -35,25 +35,25 @@ export class CallStackIterator {
 
     // currentEntry evals to 'null' meaning that the next entry is invoke main method.
     // but it will be skipped if 'this.proceed' evals to 'false' (this.stop was invoked)
-    if (this.proceed && currentEntry === null) {
-      // we need to know if user want to track exceptions
-      if (!this.exceptionEntry) {
-        // execute main method as normal
-        this.invokeOriginal()
-        this.next()
-      } else {
-        // execute main method with try catch block
-        try {
+    if (currentEntry === null) {
+      if (this.proceed) {
+        // we need to know if user want to track exceptions
+        if (!this.exceptionEntry) {
+          // execute main method as normal
           this.invokeOriginal()
-          // note that this call could be skipped
-          this.next()
-        } catch (err) {
-          // if there was an exception we need to store that reference
-          this.metadata.exception = err
-          // execute advice
-          this.executeAdvice(this.exceptionEntry)
+        } else {
+          // execute main method with try catch block
+          try {
+            this.invokeOriginal()
+          } catch (err) {
+            // if there was an exception we need to store that reference
+            this.metadata.exception = err
+            // execute advice
+            this.executeAdvice(this.exceptionEntry)
+          }
         }
       }
+      this.next()
     }
 
     // if currentEntry has a value, it must be an entry/advice descriptor
