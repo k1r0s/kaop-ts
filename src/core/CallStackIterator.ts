@@ -132,6 +132,9 @@ export class CallStackIterator {
   private isAsync (rawAdvice: Function): boolean {
     return !!rawAdvice
         .toString()
+        // Remove quotation marks
+        .replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, "")
+        // Remove comments
         .replace(/(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/g, "")
         .match(/[^a-zA-Z$]this\.next[\W]/g)
   }
