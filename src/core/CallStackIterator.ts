@@ -132,6 +132,8 @@ export class CallStackIterator {
   private isAsync (rawAdvice: Function): boolean {
     return !!rawAdvice
         .toString()
-        .match(/[^a-zA-Z$]this\.next[^a-zA-Z_$0-9]/g)
+        // Remove comments, just in case this.next is within a comment
+        .replace(/(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/g, "")
+        .match(/[\W]this\.next[\W]/g)
   }
 }
