@@ -8,4 +8,5 @@
 export abstract class AdvicePool {
   static next () {}
   static stop () {}
+  static stopped: boolean
 }

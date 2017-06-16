@@ -9,8 +9,7 @@ import { IMetadata } from "../interface/IMetadata"
  */
 export class CallStackIterator {
   private index: number = -1
-  private proceed: boolean = true
-
+  private stopped: boolean = false
     /**
      * {constructor}
      * receives all the metadata and builds up a shorted array with the current
@@ -34,9 +33,9 @@ export class CallStackIterator {
     let currentEntry = this.stack[this.index]
 
     // currentEntry evals to 'null' meaning that the next entry is invoke main method.
-    // but it will be skipped if 'this.proceed' evals to 'false' (this.stop was invoked)
+    // but it will be skipped if 'this.stopped' evals to 'true' (this.stop was invoked)
     if (currentEntry === null) {
-      if (this.proceed) {
+      if (!this.stopped) {
         // we need to know if user want to track exceptions
         if (!this.exceptionEntry) {
           // execute main method as normal
@@ -64,15 +63,15 @@ export class CallStackIterator {
   }
 
     /**
-     * stop - this method will alter proceed property of this stack which will
+     * stop - this method will alter stopped property of this stack which will
      * prevent main method to be invoked
      */
   stop () {
-    this.proceed = false
+    this.stopped = true
   }
 
   private executeAdvice (currentEntry: IStackEntry) {
-    currentEntry.advice.apply({ next: this.next.bind(this), stop: this.stop.bind(this) }, this.transformArguments(currentEntry))
+    currentEntry.advice.apply(this, this.transformArguments(currentEntry))
     if (!this.isAsync(currentEntry.advice)) {
       this.next()
     }
