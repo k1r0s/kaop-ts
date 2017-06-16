@@ -3,7 +3,7 @@ import { AdvicePool, IMetadata, afterMethod, beforeMethod, adviceMetadata, advic
 class AnotherAdvicePool extends AdvicePool {
 
   static logMethod ( @adviceMetadata metadata: IMetadata) {
-    if(this.stopped) { return }
+    if (this.stopped) { return }
     const logger = (param) => { console.log("LOGGER >> ", param) }
     logger(`${metadata.target.name}::${metadata.propertyKey}() called with arguments: `)
     logger(metadata.args)
