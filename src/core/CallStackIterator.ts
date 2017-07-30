@@ -115,6 +115,12 @@ export class CallStackIterator {
       transformedArguments[stackEntry.advice.$$meta] = this.metadata
     }
 
+    // if any param decorator was provided by the implementation then metadata and parameters are injected
+    if (typeof stackEntry.advice.$$meta === "undefined" && typeof stackEntry.advice.$$params === "undefined") {
+      transformedArguments.push(this.metadata)
+      stackEntry.args.forEach((argument) => transformedArguments.push(argument))
+    }
+
     return transformedArguments
   }
 

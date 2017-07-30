@@ -5,7 +5,7 @@ class MyAdvicePool extends AdvicePool {
     console.log(greet)
   }
 
-  static asyncAdvice (@adviceMetadata metadata: IMetadata, @adviceParam(0) milisecs) {
+  static asyncAdvice (metadata: IMetadata, milisecs) {
     console.log(`MyAdvicePool.asyncAdvice execution`)
     console.log(`reading a property of the current instance: ${metadata.scope.someProp}`)
     setTimeout(_ => {
