@@ -1,5 +1,7 @@
 import { IStackEntry } from "../interface/IStackEntry"
 import { IMetadata } from "../interface/IMetadata"
+import { MetadataKey } from "./MetadataKeys"
+import "reflect-metadata"
 
 /**
  * {class} CallStackIterator
@@ -8,23 +10,25 @@ import { IMetadata } from "../interface/IMetadata"
  * be called
  */
 export class CallStackIterator {
+
   private index: number = -1
   private stopped: boolean = false
-    /**
-     * {constructor}
-     * receives all the metadata and builds up a shorted array with the current
-     * call stack
-     * @param {IMetadata} metadata  current metadata for this stack
-     */
+
+  /**
+   * {constructor}
+   * receives all the metadata and builds up a shorted array with the current
+   * call stack
+   * @param {IMetadata} metadata  current metadata for this stack
+   */
   constructor (private metadata: IMetadata, private stack: IStackEntry[], private exceptionEntry?: IStackEntry) {
     this.next()
   }
 
-    /**
-     * next - this method will resolve by calling the next advice in the call stack
-     * or calling the main method
-     */
-  next () {
+  /**
+   * next - this method will resolve by calling the next advice in the call stack
+   * or calling the main method
+   */
+  public next () {
 
     // increment index used to retrieve following entry
     this.index++
@@ -62,48 +66,50 @@ export class CallStackIterator {
     }
   }
 
-    /**
-     * stop - this method will alter stopped property of this stack which will
-     * prevent main method to be invoked
-     */
-  stop () {
+  /**
+   * stop - this method will alter stopped property of this stack which will
+   * prevent main method to be invoked
+   */
+  public stop () {
     this.stopped = true
   }
 
   private executeAdvice (currentEntry: IStackEntry) {
-    currentEntry.advice.apply(this, this.transformArguments(currentEntry))
-    if (!this.isAsync(currentEntry.advice)) {
+    currentEntry.adviceFn.apply(this, this.transformArguments(currentEntry))
+    if (!this.isAsync(currentEntry.adviceFn)) {
       this.next()
     }
   }
 
-    /**
-     * @private invokeOriginal
-     *
-     * this method is responsible of invoke the main method with the correct scope
-     */
+  /**
+   * @private invokeOriginal
+   *
+   * this method is responsible of invoke the main method with the correct scope
+   */
   private invokeOriginal (): void {
     this.metadata.result = this.metadata.rawMethod.apply(this.metadata.scope, this.metadata.args)
   }
 
-    /**
-     * @private transformArguments
-     *
-     * this method organize advice params at requested way
-     *
-     * @param {IStackEntry} stackEntry contains various references that were modified
-     * previously to manage advice params
-     *
-     * @return {Array} shorted arguments
-     */
+  /**
+   * @private transformArguments
+   *
+   * this method organize advice params at requested way
+   *
+   * @param {IStackEntry} stackEntry contains various references that were modified
+   * previously to manage advice params
+   *
+   * @return {Array} shorted arguments
+   */
   private transformArguments (stackEntry: IStackEntry): any[] {
 
-    let transformedArguments = []
+    const transformedArguments = []
+    const reflectAdviceParams: number[] = Reflect.getMetadata(MetadataKey.ADVICE_PARAMS, stackEntry.adviceFn)
+    const reflectMetaParam: number = Reflect.getMetadata(MetadataKey.METADATA_PARAM, stackEntry.adviceFn)
 
     // if stackEntry.advice.$$params evals is an Array means that the user
     // implemented @adviceParams
-    if (stackEntry.advice.$$params instanceof Array) {
-      stackEntry.advice.$$params.forEach((requestedArgIndex, index) => {
+    if (reflectAdviceParams instanceof Array) {
+      reflectAdviceParams.forEach((requestedArgIndex, index) => {
         transformedArguments[index] = stackEntry.args[requestedArgIndex]
       })
     }
@@ -111,12 +117,12 @@ export class CallStackIterator {
     // if stackEntry.advice.$$meta evals is an Array means that the user
     // implemented @adviceMetadata, so we need to know which index user wants to
     // be placed metadata argument
-    if (typeof stackEntry.advice.$$meta === "number") {
-      transformedArguments[stackEntry.advice.$$meta] = this.metadata
+    if (typeof reflectMetaParam === "number") {
+      transformedArguments[reflectMetaParam] = this.metadata
     }
 
     // if any param decorator was provided by the implementation then metadata and parameters are injected
-    if (typeof stackEntry.advice.$$meta === "undefined" && typeof stackEntry.advice.$$params === "undefined") {
+    if (typeof reflectMetaParam === "undefined" && typeof reflectAdviceParams === "undefined") {
       transformedArguments.push(this.metadata)
       stackEntry.args.forEach((argument) => transformedArguments.push(argument))
     }
@@ -124,16 +130,16 @@ export class CallStackIterator {
     return transformedArguments
   }
 
-    /**
-     * @private isAsync
-     * this method seeks within function body the expression 'this.next' whichs
-     * means that the advice implementation include some async declaration or
-     * process
-     *
-     * @param {Function} rawAdvice method to be checked
-     *
-     * @return {boolean}
-     */
+  /**
+   * @private isAsync
+   * this method seeks within function body the expression 'this.next' whichs
+   * means that the advice implementation include some async declaration or
+   * process
+   *
+   * @param {Function} rawAdvice method to be checked
+   *
+   * @return {boolean}
+   */
   private isAsync (rawAdvice: Function): boolean {
     return !!rawAdvice
         .toString()

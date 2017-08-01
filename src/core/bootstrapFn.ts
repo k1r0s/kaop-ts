@@ -1,6 +1,7 @@
 import { CallStackIterator } from "./CallStackIterator"
 import { IMetadata } from "../interface/IMetadata"
-import { IFakeMethodReplacement } from "../interface/IFakeMethodReplacement"
+import { MetadataKey } from "./MetadataKeys"
+import "reflect-metadata"
 
 /**
  * @function bootstrap - this function replaces|wraps the given method (that was decorated)
@@ -12,10 +13,10 @@ import { IFakeMethodReplacement } from "../interface/IFakeMethodReplacement"
  * @param  {Function}               rawMethod         decorated method reference
  * @return {IFakeMethodReplacement}                   description
  */
-export function bootstrap (target: Object, propertyKey: string, rawMethod: (...args: any[]) => any, result?: any): IFakeMethodReplacement {
+export function bootstrap (target: Object, propertyKey: string, rawMethod: (...args: any[]) => any, result?: any): Function {
 
   // this function replaces main decorated method
-  const fakeReplacement = function (...args: any[]): any {
+  return function (...args: any[]): any {
 
     // here we receive almost every needed metadata property
     const metadata = {
@@ -28,18 +29,22 @@ export function bootstrap (target: Object, propertyKey: string, rawMethod: (...a
     } as IMetadata
 
     // concat before and after stacks
-    let stack = [].concat(fakeReplacement.$$before, [null], fakeReplacement.$$after)
+    let stack = [].concat(
+      Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, arguments.callee),
+      [null],
+      Reflect.getMetadata(MetadataKey.AFTER_ADVICES, arguments.callee)
+    )
 
     // creates an instance which recursively will drive over advices or methods
     // calling this.next (CallStackIterator method)
     /* tslint:disable-next-line */
-    new CallStackIterator(metadata, stack, fakeReplacement.$$error)
+    new CallStackIterator(metadata, stack, Reflect.getMetadata(MetadataKey.ERROR_PLACEHOLDER, arguments.callee))
     return metadata.result
-  } as IFakeMethodReplacement
+  }
+}
 
-  // initialize stores in returned function
-  fakeReplacement.$$before = []
-  fakeReplacement.$$after = []
-  fakeReplacement.$$error = null
-  return fakeReplacement
+export function buildReflectionProperties (subject: any) {
+  Reflect.defineMetadata(MetadataKey.BEFORE_ADVICES, [], subject)
+  Reflect.defineMetadata(MetadataKey.AFTER_ADVICES, [], subject)
+  Reflect.defineMetadata(MetadataKey.ERROR_PLACEHOLDER, null, subject)
 }

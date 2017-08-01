@@ -1,6 +1,5 @@
 import { CallStackIterator } from '../src/core/CallStackIterator'
 import { IStackEntry } from '../src/interface/IStackEntry'
-import { IAdviceParamInjector } from '../src/interface/IAdviceParamInjector'
 import { AdvicePool, IMetadata } from "../src/kaop-ts"
 
 describe('CallStackIterator', () => {
@@ -28,11 +27,7 @@ describe('CallStackIterator', () => {
     result: {}
   }
 
-  interface AdviceMock extends IAdviceParamInjector {
-    mockClear: Function
-  }
-
-  const advice = (jest.fn() as any) as AdviceMock
+  let advice = jest.fn()
 
   let stackEntries: IStackEntry[] = [null]
   let iterator = new CallStackIterator(metadata, stackEntries)
@@ -55,22 +50,9 @@ describe('CallStackIterator', () => {
   })
 
   it('Calls an advice if the current entry is not null', () => {
-    const entries: IStackEntry[] = [{ advice, args: [] }]
+    const entries: IStackEntry[] = [{ adviceFn: advice, args: [] }]
     iterator = new CallStackIterator(metadata, entries)
     expect(metadata.rawMethod).not.toBeCalled()
     expect(advice).toBeCalled()
-  })
-
-  it('Calls an advice if the current entry is not null', () => {
-    const fakeAdvice = MyAdvice.isNotAsync as IAdviceParamInjector
-    const entries: IStackEntry[] = [
-      null,
-      { advice: fakeAdvice, args: [] },
-      { advice, args: [] }
-    ]
-    iterator = new CallStackIterator(metadata, entries)
-    expect(metadata.rawMethod).toBeCalled()
-    expect(advice).toBeCalled()
-    expect(spies.isNotAsync).toBeCalled()
   })
 })

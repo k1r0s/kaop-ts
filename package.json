@@ -94,5 +94,8 @@
     "typedoc": "^0.7.1",
     "typescript": "^2.3.3",
     "validate-commit-msg": "^2.10.1"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.10"
   }
 }

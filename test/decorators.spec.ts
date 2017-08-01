@@ -1,4 +1,5 @@
 import { adviceMetadata, adviceParam } from "../src/decorators"
+import { MetadataKey } from '../src/core/MetadataKeys';
 
 describe(`
 adviceMetadata decorator should be used to represent the position where metadata
@@ -6,12 +7,11 @@ must be injected as a param within an advice
   `, () => {
 
   it("should change $$meta property from a function object", () => {
-    let fakeClass: any = { fakeMethod: function() {}}
-
+    const fakeClass: any = function() {}
+    fakeClass.fakeMethod = function() {}
     adviceMetadata(fakeClass, "fakeMethod", 0)
-
-    expect(fakeClass.fakeMethod).toHaveProperty("$$meta")
-    expect(fakeClass.fakeMethod.$$meta).toBe(0)
+    const metaIndex = Reflect.getMetadata(MetadataKey.METADATA_PARAM, fakeClass["fakeMethod"])
+    expect(metaIndex).toBe(0)
   })
 })
 
@@ -33,11 +33,11 @@ be placed
     let fn3 = adviceParam(2)
     fn3(fakeClass, "fakeMethod", 3)
 
+    const adviceParamsArr = Reflect.getMetadata(MetadataKey.ADVICE_PARAMS, fakeClass["fakeMethod"])
 
-
-    expect(fakeClass.fakeMethod.$$params).toBeInstanceOf(Array)
-    expect(fakeClass.fakeMethod.$$params.reduce((a, b) => a + b)).toBe(3)
-    expect(fakeClass.fakeMethod.$$params).toMatchObject([, 0, 1, 2])
+    expect(adviceParamsArr).toBeInstanceOf(Array)
+    expect(adviceParamsArr.reduce((a, b) => a + b)).toBe(3)
+    expect(adviceParamsArr).toMatchObject([, 0, 1, 2])
   })
 
   it("should save index positions in array", () => {
@@ -48,10 +48,10 @@ be placed
     let fn3 = adviceParam(4)
     fn3(fakeClass, "fakeMethod", 3)
 
+    const adviceParamsArr = Reflect.getMetadata(MetadataKey.ADVICE_PARAMS, fakeClass["fakeMethod"])
 
-
-    expect(fakeClass.fakeMethod.$$params).toBeInstanceOf(Array)
-    expect(fakeClass.fakeMethod.$$params.reduce((a, b) => a + b)).toBe(9)
-    expect(fakeClass.fakeMethod.$$params).toMatchObject([ , 3, , 4, 2])
+    expect(adviceParamsArr).toBeInstanceOf(Array)
+    expect(adviceParamsArr.reduce((a, b) => a + b)).toBe(9)
+    expect(adviceParamsArr).toMatchObject([ , 3, , 4, 2])
   })
 })

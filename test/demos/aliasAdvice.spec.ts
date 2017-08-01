@@ -1,4 +1,5 @@
 import { AdvicePool, beforeMethod, adviceParam, adviceMetadata, IMetadata } from "../../src/kaop-ts"
+import { MetadataKey } from '../../src/core/MetadataKeys'
 
 class MyAdvicePool extends AdvicePool {
   static testAdvice (@adviceMetadata meta: IMetadata) {
