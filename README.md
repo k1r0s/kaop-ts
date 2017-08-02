@@ -201,11 +201,44 @@ Be careful, since async advices return `undefined`
 
 ### Troubleshooting
 
+##### Babel
+
+At first we did not support Babel because they drop support for decorators (year ago).. nowadays they're going to fully implement this proposal, but still we're waiting..
+
+Of course we're going to provide support for Babel users, but think that kaop-ts is intended to work with Typescript. If Babel team implements decorators proposal as it fit it will be good for us also. Please refer here: https://github.com/babel/proposals/issues/13
+
+You should have this `.babelrc` setup: 
+
+```
+{
+    "presets": [
+      "latest",
+      "react",
+      "stage-2"
+    ],
+    "plugins": ["transform-decorators-legacy"]
+}
+```
+
+This library uses parameter Decorators proposal which is a WIP on babel. We made several modifications to make param decorators optional when typing advices.
+
+So you have to avoid use of `adviceParam` and `adviceMetadada`. If you don't use param decorators advices will always have the following arguments:
+
+```javascript
+function myAdvice(metadata, param0, param1 [, paramx...]){}
+```
+
+[Motivation](https://github.com/k1r0s/kaop-ts/issues/9)
+
 ##### `IMetadata was not found in 'kaop-ts'`
 
 This is due to an issue laying on TypeScript + Webpack + Angular.
 
 Check out the [reasons and workaround](https://github.com/k1r0s/kaop-ts/issues/5#issuecomment-305759257)
+
+#####  Do not reassign methods or use decorators on arrow functions (i.e.: public something = () => {})
+
+kaop-ts uses metadata properties inside methods or classes. If you alter that references by reasignment you'll mess advice call stack.
 
 #####  Avoid async advices with some frameworks functions (i.e.: React `render` function)
 
