@@ -2,11 +2,12 @@ import { AdvicePool } from "../src/core/AdvicePool"
 import { bootstrap } from "../src/core/bootstrapFn"
 import { CallStackIterator } from "../src/core/CallStackIterator"
 
-
-import { IFakeMethodReplacement } from "../src/interface/IFakeMethodReplacement"
 import { IMetadata } from "../src/interface/IMetadata"
 import { IStackEntry } from "../src/interface/IStackEntry"
-import { IAdviceParamInjector } from "../src/interface/IAdviceParamInjector"
+import { adviceParam } from '../src/decorators';
+
+const Person = function () {}
+Person.prototype.setName = function() {}
 
 describe("Advice pool does nothig, it only serves as representation of some CallStackIterator private methods", () => {
   it("AdvicePool should contain next and stop void methods", () => {
@@ -17,24 +18,12 @@ describe("Advice pool does nothig, it only serves as representation of some Call
   })
 })
 
-describe("bootstrap essentialy wraps methods returning an instance of IFakeMethodReplacement", () => {
-  it("bootstrap fn should return an object with several properties", () => {
-
-    let fakeSubject = bootstrap(null, null, null)
-
-    expect(fakeSubject).toBeInstanceOf(Object)
-    expect(fakeSubject.$$after).toBeInstanceOf(Array)
-    expect(fakeSubject.$$before).toBeInstanceOf(Array)
-    expect(fakeSubject.$$error).toBeNull()
-
-  })
-})
-
 describe("CallStackIterator contains many functions so call 'advices' which can access decorated context", () => {
 
   let fakeTarget: any, fakeMetadata: IMetadata
 
   beforeEach(() => {
+
     fakeMetadata = {
       scope: { name: "Jon" },
       target: function Person () {},
@@ -62,9 +51,15 @@ describe("CallStackIterator contains many functions so call 'advices' which can 
   it("an advice should be injected before method execution which will remove first argument", () => {
     let methodSpy = jest.fn()
     fakeMetadata.rawMethod = function (name) { methodSpy(); return this.name = name }
-    let aParamInjector = function(meta){ meta.args.pop() } as IAdviceParamInjector
-    aParamInjector.$$meta = 0
-    let fakeStack = [{advice: aParamInjector, args: []} as IStackEntry, null]
+    let fakeStack = [
+      {
+        adviceFn: function(meta){
+          meta.args.pop()
+        },
+        args: []
+      } as IStackEntry,
+      null
+    ]
 
     new CallStackIterator(fakeMetadata, fakeStack)
 
@@ -76,8 +71,8 @@ describe("CallStackIterator contains many functions so call 'advices' which can 
   it("an advice containing callback should be called after the execution of main method", (done) => {
     let methodSpy = jest.fn()
     fakeMetadata.rawMethod = function (name) { methodSpy(); return this.name = name }
-    let aParamInjector = function(){ setTimeout(done, 50) } as IAdviceParamInjector
-    let fakeStack = [null, {advice: aParamInjector, args: []} as IStackEntry]
+    let aParamInjector = function(){ setTimeout(done, 50) }
+    let fakeStack = [null, {adviceFn: aParamInjector, args: []} as IStackEntry]
 
     new CallStackIterator(fakeMetadata, fakeStack)
 
@@ -85,7 +80,7 @@ describe("CallStackIterator contains many functions so call 'advices' which can 
     expect(fakeMetadata.result).toMatch(/Peter/)
     expect(fakeMetadata.scope.name).toMatch(/Peter/)
   })
-  
+
   it("perform an async stack with 2 delays sequentially", (done) => {
     let callback = () => {
 
@@ -99,13 +94,11 @@ describe("CallStackIterator contains many functions so call 'advices' which can 
     let methodSpy = jest.fn()
     let adviceSpy = jest.fn()
     fakeMetadata.rawMethod = function (name, another, cbk) { methodSpy(); this.name = name + another; cbk(); }
-    let aParamInjector = function(meta){ adviceSpy(); setTimeout(_ => { meta.args.push("someFakeString"); this.next() }, 50) } as IAdviceParamInjector
-    let bParamInjector = function(meta){ adviceSpy(); setTimeout(_ => { meta.args.push(callback); this.next() }, 50) } as IAdviceParamInjector
-    aParamInjector.$$meta = 0
-    bParamInjector.$$meta = 0
+    let aParamInjector = function(meta){ adviceSpy(); setTimeout(_ => { meta.args.push("someFakeString"); this.next() }, 50) }
+    let bParamInjector = function(meta){ adviceSpy(); setTimeout(_ => { meta.args.push(callback); this.next() }, 50) }
     let fakeStack = [
-      {advice: aParamInjector, args: []} as IStackEntry,
-      {advice: bParamInjector, args: []} as IStackEntry,
+      {adviceFn: aParamInjector, args: []} as IStackEntry,
+      {adviceFn: bParamInjector, args: []} as IStackEntry,
       null]
 
     new CallStackIterator(fakeMetadata, fakeStack)
@@ -114,15 +107,21 @@ describe("CallStackIterator contains many functions so call 'advices' which can 
   it("advices accept parameters to change their behavior", () => {
     let methodSpy = jest.fn()
     fakeMetadata.rawMethod = function (name) { methodSpy(); return this.name = name }
-    let aParamInjector = function(meta, param){
-      expect(meta).toBeUndefined()
-      expect(param).toBeDefined()
-      expect(param).toBeGreaterThan(2)
+    let obj = {
+      adv: function(meta, param){
+        expect(meta).toBeUndefined()
+        expect(param).toBeDefined()
+        expect(param).toBeGreaterThan(2)
 
-      this.stop()
-    } as IAdviceParamInjector
-    aParamInjector.$$params = [undefined, 0]
-    let fakeStack = [{advice: aParamInjector, args: [3]} as IStackEntry, null]
+        this.stop()
+      }
+    }
+
+    const fn = adviceParam(0)
+
+    fn(obj, "adv", 1)
+
+    let fakeStack = [{adviceFn: obj.adv, args: [3]} as IStackEntry, null]
 
     new CallStackIterator(fakeMetadata, fakeStack)
 
@@ -133,12 +132,11 @@ describe("CallStackIterator contains many functions so call 'advices' which can 
   it("CallStackIterator thirt param is used to set exception handler advice", () => {
     let exceptionSpy = jest.fn()
     fakeMetadata.rawMethod = function (name) { return this.name() }
-    let aParamInjector = function(meta){
+    let adviceFn = function(meta){
       exceptionSpy()
       expect(meta.exception).toBeInstanceOf(Error)
-    } as IAdviceParamInjector
-    aParamInjector.$$meta = 0
-    new CallStackIterator(fakeMetadata, [null], {advice: aParamInjector, args: []} as IStackEntry)
+    }
+    new CallStackIterator(fakeMetadata, [null], { adviceFn, args: [] } as IStackEntry)
 
     expect(fakeMetadata.result).toBeUndefined()
     expect(exceptionSpy).toHaveBeenCalledTimes(1)

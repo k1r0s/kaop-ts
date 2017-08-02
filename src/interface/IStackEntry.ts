@@ -1,6 +1,4 @@
-import { IAdviceParamInjector } from "./IAdviceParamInjector"
-
 export interface IStackEntry {
-  advice: IAdviceParamInjector
+  adviceFn: (...args) => void
   args: any[]
 }

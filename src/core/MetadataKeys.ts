@@ -1,0 +1,7 @@
+export enum MetadataKey {
+    METADATA_PARAM,
+    ADVICE_PARAMS,
+    BEFORE_ADVICES,
+    AFTER_ADVICES,
+    ERROR_PLACEHOLDER
+}

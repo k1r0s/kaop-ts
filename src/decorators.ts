@@ -1,20 +1,20 @@
 import { IClassAdviceSignature } from "./interface/IClassAdviceSignature"
-import { bootstrap } from "./core/bootstrapFn"
+import { bootstrap , buildReflectionProperties } from "./core/bootstrapFn"
 import { IAdviceSignature } from "./interface/IAdviceSignature"
-import { IFakeMethodReplacement } from "./interface/IFakeMethodReplacement"
-import { IAdviceParamInjector } from "./interface/IAdviceParamInjector"
 import { IStackEntry } from "./interface/IStackEntry"
+import { MetadataKey } from "./core/MetadataKeys"
+import "reflect-metadata"
 
 /**
  * @function adviceMetadata - this decorator function sets a property '$$meta'
  * with the requested metadata param index
  *
- * @param  {Object} target          method class
+ * @param  {any} target          method class
  * @param  {string} propertyKey     ..
  * @param  {number} parameterIndex  ..
  */
-export function adviceMetadata (target: Object, propertyKey: string | symbol, parameterIndex: number) {
-  target[propertyKey].$$meta = parameterIndex
+export function adviceMetadata (target: any, propertyKey: string | symbol, parameterIndex: number) {
+  Reflect.defineMetadata(MetadataKey.METADATA_PARAM, parameterIndex, target[propertyKey])
 }
 
 /**
@@ -24,9 +24,10 @@ export function adviceMetadata (target: Object, propertyKey: string | symbol, pa
  * @param  {number} index requested index param
  */
 export function adviceParam (index: number) {
-  return function (target: Object, propertyKey: string | symbol, parameterIndex: number) {
-    if (!target[propertyKey].$$params) { target[propertyKey].$$params = [] }
-    target[propertyKey].$$params[parameterIndex] = index
+  return function (target: any, propertyKey: string, parameterIndex: number) {
+    const parameters = Reflect.getMetadata(MetadataKey.ADVICE_PARAMS, target[propertyKey]) as any[] || []
+    parameters[parameterIndex] = index
+    Reflect.defineMetadata(MetadataKey.ADVICE_PARAMS, parameters, target[propertyKey])
   }
 }
 
@@ -40,13 +41,15 @@ export function adviceParam (index: number) {
  */
 export function afterInstance (adviceFn: (...args) => void, ...args: any[]): IClassAdviceSignature {
   return function (target: any) {
-    if (!target || !target.$$before) {
-      let rawConstructor = target
-      target = bootstrap(undefined, "constructor", rawConstructor)
+    let afters = Reflect.getMetadata(MetadataKey.AFTER_ADVICES, target) as IStackEntry[]
+    if (!afters) {
+      target = bootstrap(target, "constructor", target)
+      buildReflectionProperties(target);
     }
-    const advice = adviceFn as IAdviceParamInjector
-    const stackEntry: IStackEntry = { advice, args }
-    target.$$after.unshift(stackEntry)
+    const stackEntry: IStackEntry = { adviceFn, args }
+    afters = Reflect.getMetadata(MetadataKey.AFTER_ADVICES, target) as IStackEntry[]
+    afters.unshift(stackEntry)
+    Reflect.defineMetadata(MetadataKey.AFTER_ADVICES, afters, target)
     return target
   }
 }
@@ -61,13 +64,15 @@ export function afterInstance (adviceFn: (...args) => void, ...args: any[]): ICl
  */
 export function afterMethod (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
   return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
-    if (!descriptor.value.$$before) {
-      let rawMethod = descriptor.value
-      descriptor.value = bootstrap(target, propertyKey, rawMethod)
+    let afters = Reflect.getMetadata(MetadataKey.AFTER_ADVICES, descriptor.value) as IStackEntry[]
+    if (!afters) {
+      descriptor.value = bootstrap(target, propertyKey, descriptor.value)
+      buildReflectionProperties(descriptor.value)
     }
-    const advice = adviceFn as IAdviceParamInjector
-    const stackEntry: IStackEntry = { advice, args }
-    descriptor.value.$$after.unshift(stackEntry)
+    const stackEntry: IStackEntry = { adviceFn, args }
+    afters = Reflect.getMetadata(MetadataKey.AFTER_ADVICES, descriptor.value) as IStackEntry[]
+    afters.unshift(stackEntry)
+    Reflect.defineMetadata(MetadataKey.AFTER_ADVICES, afters, descriptor.value)
     return descriptor
   }
 }
@@ -82,13 +87,15 @@ export function afterMethod (adviceFn: (...args) => void, ...args: any[]): IAdvi
  */
 export function beforeInstance (adviceFn: (...args) => void, ...args: any[]): IClassAdviceSignature {
   return function (target: any) {
-    if (!target || !target.$$before) {
-      let rawConstructor = target
-      target = bootstrap(undefined, "constructor", rawConstructor)
+    let befores = Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, target) as IStackEntry[]
+    if (!befores) {
+      target = bootstrap(target, "constructor", target)
+      buildReflectionProperties(target)
     }
-    const advice = adviceFn as IAdviceParamInjector
-    const stackEntry: IStackEntry = { advice, args }
-    target.$$before.unshift(stackEntry)
+    const stackEntry: IStackEntry = { adviceFn, args }
+    befores = Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, target) as IStackEntry[]
+    befores.unshift(stackEntry)
+    Reflect.defineMetadata(MetadataKey.BEFORE_ADVICES, befores, target)
     return target
   }
 }
@@ -103,13 +110,15 @@ export function beforeInstance (adviceFn: (...args) => void, ...args: any[]): IC
  */
 export function beforeMethod (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
   return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
-    if (!descriptor.value.$$before) {
-      let rawMethod = descriptor.value
-      descriptor.value = bootstrap(target, propertyKey, rawMethod)
+    let befores = Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, descriptor.value) as IStackEntry[]
+    if (!befores) {
+      descriptor.value = bootstrap(target, propertyKey, descriptor.value)
+      buildReflectionProperties(descriptor.value)
     }
-    const advice = adviceFn as IAdviceParamInjector
-    const stackEntry: IStackEntry = { advice, args }
-    descriptor.value.$$before.unshift(stackEntry)
+    const stackEntry: IStackEntry = { adviceFn, args }
+    befores = Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, descriptor.value) as IStackEntry[]
+    befores.unshift(stackEntry)
+    Reflect.defineMetadata(MetadataKey.BEFORE_ADVICES, befores, descriptor.value)
     return descriptor
   }
 }
@@ -117,7 +126,7 @@ export function beforeMethod (adviceFn: (...args) => void, ...args: any[]): IAdv
 
 /**
  * @function onException - this decorator function places the `adviceFn` as a
- * handler for any exception triggered by decorated method 
+ * handler for any exception triggered by decorated method
  *
  * @param  {Function}         adviceFn advice function
  * @param  {Array}            args advice arguments
@@ -125,17 +134,16 @@ export function beforeMethod (adviceFn: (...args) => void, ...args: any[]): IAdv
  */
 export function onException (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
   return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
-    // If descriptor hasn't been initializated
-    if (!descriptor.value.$$before) {
-      let rawMethod = descriptor.value
+    let error = Reflect.getMetadata(MetadataKey.ERROR_PLACEHOLDER, descriptor.value) as IStackEntry
+    // If descriptor hasn't been initializated (by default has to be initializated to 'null')
+    if (error !== null) {
       // descriptor is initializated, method is wrapped
-      descriptor.value = bootstrap(target, propertyKey, rawMethod)
+      descriptor.value = bootstrap(target, propertyKey, descriptor.value)
+      buildReflectionProperties(descriptor.value)
     }
-    const advice = adviceFn as IAdviceParamInjector
-    const stackEntry: IStackEntry = { advice, args }
-
+    const stackEntry: IStackEntry = { adviceFn, args }
     // Place it on $$error placeholder which will be checked later
-    descriptor.value.$$error = stackEntry
+    Reflect.defineMetadata(MetadataKey.ERROR_PLACEHOLDER, stackEntry, descriptor.value)
     return descriptor
   }
 }
