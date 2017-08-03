@@ -15,11 +15,14 @@ class YetAnotherDummyTest {
   constructor () {
     console.log(arguments)
   }
+
+  some() {}
 }
 
 describe("kaop-ts demo -> instance advices showcase", () => {
   it("advices can be executed within the class constructor as 'instance decorators'", (done) => {
     let test = new YetAnotherDummyTest()
+    expect(test.some).toBeTruthy()
     done()
   })
 })

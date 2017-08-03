@@ -13,10 +13,9 @@ import "reflect-metadata"
  * @param  {Function}               rawMethod         decorated method reference
  * @return {IFakeMethodReplacement}                   description
  */
-export function bootstrap (target: Object, propertyKey: string, rawMethod: (...args: any[]) => any, result?: any): Function {
-
+export function bootstrap (target: any, propertyKey: string, rawMethod: (...args: any[]) => any, result?: any): Function {
   // this function replaces main decorated method
-  return function (...args: any[]): any {
+  const fnref = function (...args: any[]): any {
 
     // here we receive almost every needed metadata property
     const metadata = {
@@ -30,17 +29,22 @@ export function bootstrap (target: Object, propertyKey: string, rawMethod: (...a
 
     // concat before and after stacks
     let stack = [].concat(
-      Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, arguments.callee),
+      Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, fnref),
       [null],
-      Reflect.getMetadata(MetadataKey.AFTER_ADVICES, arguments.callee)
+      Reflect.getMetadata(MetadataKey.AFTER_ADVICES, fnref)
     )
 
     // creates an instance which recursively will drive over advices or methods
     // calling this.next (CallStackIterator method)
     /* tslint:disable-next-line */
-    new CallStackIterator(metadata, stack, Reflect.getMetadata(MetadataKey.ERROR_PLACEHOLDER, arguments.callee))
+    new CallStackIterator(metadata, stack, Reflect.getMetadata(MetadataKey.ERROR_PLACEHOLDER, fnref))
     return metadata.result
   }
+
+  // keep original prototype
+  fnref.prototype = target.prototype 
+
+  return fnref
 }
 
 export function buildReflectionProperties (subject: any) {
