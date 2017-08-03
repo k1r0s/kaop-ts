@@ -114,7 +114,7 @@ export function beforeMethod<B = any, K extends keyof B = any> (adviceFn: (this:
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     let befores = Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, descriptor.value) as IStackEntry[]
     if (!befores) {
-      descriptor.value = bootstrap<B>(target, propertyKey, descriptor.value)
+      descriptor.value = bootstrap(target, propertyKey, descriptor.value)
       buildReflectionProperties(descriptor.value)
     }
     const stackEntry: IStackEntry = { adviceFn, args }

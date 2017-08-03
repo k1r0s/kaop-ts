@@ -3,25 +3,25 @@ import { beforeInstance } from "../../src/kaop-ts"
 // about how to implement raw DI
 
 class Http {
-  fetch(): Promise<any> {
+  fetch (): Promise<any> {
     return new Promise((resolve, reject) => {
       setTimeout(resolve, 500)
     })
   }
 }
 
-const Inject = function(...types) {
-  return beforeInstance(function(meta) {
-    meta.args = types.map(type => new type)
+const Inject = function (...types) {
+  return beforeInstance(function (meta) {
+    meta.args = types.map(type => new type())
   })
 }
 
 @Inject(Http)
 class MyComponent {
 
-  constructor(private http?: Http){}
+  constructor (private http?: Http) {}
 
-  public somethingAync(callback: () => void) {
+  somethingAync (callback: () => void) {
     this.http.fetch().then(callback)
   }
 }
@@ -29,9 +29,8 @@ class MyComponent {
 const comp = new MyComponent()
 
 describe("It is worth to implement", () => {
-  
+
   it("should wait 500 secs until fulfit", (done) => {
     comp.somethingAync(done)
   })
 })
-
