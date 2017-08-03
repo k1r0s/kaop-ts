@@ -1,5 +1,5 @@
-export interface IMetadata {
-  scope: any,
+export interface IMetadata<B = any> {
+  scope: B,
   target: any,
     // target: Object | Function,
   propertyKey: string,

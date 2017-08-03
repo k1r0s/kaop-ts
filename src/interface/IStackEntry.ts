@@ -1,4 +1,6 @@
+import { AdvicePool } from "../core/AdvicePool"
+
 export interface IStackEntry {
-  adviceFn: (...args) => void
+  adviceFn: (this: AdvicePool, ...args) => void
   args: any[]
 }

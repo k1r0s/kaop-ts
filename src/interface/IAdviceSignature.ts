@@ -1,3 +1,3 @@
-export interface IAdviceSignature {
-  (target: any, propertyKey: string, descriptor: PropertyDescriptor)
+export interface IAdviceSignature<B, K> {
+  (target: B, propertyKey: K, descriptor: PropertyDescriptor)
 }

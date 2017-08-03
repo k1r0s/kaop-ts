@@ -1,7 +1,9 @@
 import { IClassAdviceSignature } from "./interface/IClassAdviceSignature"
 import { bootstrap , buildReflectionProperties } from "./core/bootstrapFn"
+import { IAdviceContext } from "./interface/IAdviceContext"
 import { IAdviceSignature } from "./interface/IAdviceSignature"
 import { IStackEntry } from "./interface/IStackEntry"
+import { IMetadata } from "./interface/IMetadata"
 import { MetadataKey } from "./core/MetadataKeys"
 import "reflect-metadata"
 
@@ -39,7 +41,7 @@ export function adviceParam (index: number) {
  * @param  {Array}    args                  advice arguments
  * @return {IClassAdviceSignature}          wrapped constructor reference
  */
-export function afterInstance (adviceFn: (...args) => void, ...args: any[]): IClassAdviceSignature {
+ export function afterInstance<B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IClassAdviceSignature<B> {
   return function (target: any) {
     let afters = Reflect.getMetadata(MetadataKey.AFTER_ADVICES, target) as IStackEntry[]
     if (!afters) {
@@ -62,8 +64,8 @@ export function afterInstance (adviceFn: (...args) => void, ...args: any[]): ICl
  * @param  {Array}    args                  advice arguments
  * @return {IAdviceSignature}               wrapped method reference
  */
-export function afterMethod (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
-  return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
+export function afterMethod<B = any, K extends keyof B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IAdviceSignature<B, K> {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     let afters = Reflect.getMetadata(MetadataKey.AFTER_ADVICES, descriptor.value) as IStackEntry[]
     if (!afters) {
       descriptor.value = bootstrap(target, propertyKey, descriptor.value)
@@ -85,7 +87,7 @@ export function afterMethod (adviceFn: (...args) => void, ...args: any[]): IAdvi
  * @param  {Array}    args                  advice arguments
  * @return {IClassAdviceSignature}          wrapped constructor reference
  */
-export function beforeInstance (adviceFn: (...args) => void, ...args: any[]): IClassAdviceSignature {
+export function beforeInstance<B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IClassAdviceSignature<B> {
   return function (target: any) {
     let befores = Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, target) as IStackEntry[]
     if (!befores) {
@@ -108,11 +110,11 @@ export function beforeInstance (adviceFn: (...args) => void, ...args: any[]): IC
  * @param  {Array}    args                  advice arguments
  * @return {IAdviceSignature}               wrapped method reference
  */
-export function beforeMethod (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
-  return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
+export function beforeMethod<B = any, K extends keyof B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IAdviceSignature<B, K> {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     let befores = Reflect.getMetadata(MetadataKey.BEFORE_ADVICES, descriptor.value) as IStackEntry[]
     if (!befores) {
-      descriptor.value = bootstrap(target, propertyKey, descriptor.value)
+      descriptor.value = bootstrap<B>(target, propertyKey, descriptor.value)
       buildReflectionProperties(descriptor.value)
     }
     const stackEntry: IStackEntry = { adviceFn, args }
@@ -132,8 +134,8 @@ export function beforeMethod (adviceFn: (...args) => void, ...args: any[]): IAdv
  * @param  {Array}            args advice arguments
  * @return {IAdviceSignature} wrapped method reference
  */
-export function onException (adviceFn: (...args) => void, ...args: any[]): IAdviceSignature {
-  return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
+export function onException<B = any, K extends keyof B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IAdviceSignature<B, K> {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     let error = Reflect.getMetadata(MetadataKey.ERROR_PLACEHOLDER, descriptor.value) as IStackEntry
     // If descriptor hasn't been initializated (by default has to be initializated to 'null')
     if (error !== null) {
