@@ -42,7 +42,7 @@ export function bootstrap (target: any, propertyKey: string, rawMethod: (...args
   }
 
   // keep original prototype
-  fnref.prototype = target.prototype 
+  fnref.prototype = target.prototype
 
   return fnref
 }

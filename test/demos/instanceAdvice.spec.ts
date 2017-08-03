@@ -16,7 +16,7 @@ class YetAnotherDummyTest {
     console.log(arguments)
   }
 
-  some() {}
+  some () { return }
 }
 
 describe("kaop-ts demo -> instance advices showcase", () => {
