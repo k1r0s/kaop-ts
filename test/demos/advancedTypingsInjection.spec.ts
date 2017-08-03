@@ -3,10 +3,8 @@ import { beforeInstance } from "../../src/kaop-ts"
 // about how to implement raw DI
 
 class Http {
-  fetch (): Promise<any> {
-    return new Promise((resolve, reject) => {
-      setTimeout(resolve, 500)
-    })
+  fetch (cbk: () => void): any {
+    return setTimeout(cbk, 500)
   }
 }
 
@@ -22,7 +20,7 @@ class MyComponent {
   constructor (private http?: Http) {}
 
   somethingAync (callback: () => void) {
-    this.http.fetch().then(callback)
+    this.http.fetch(callback)
   }
 }
 
