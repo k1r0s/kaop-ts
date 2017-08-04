@@ -35,7 +35,7 @@ DummyExample.calculateSomething(5, 5) // 50
 
 ### Usage
 
-#### How do I define an advice?
+#### How do I define an Advice?
 
 ###### as an anonymous function:
 ```typescript
@@ -100,10 +100,10 @@ class MyAdvices extends AdvicePool {
 
 ```typescript
 @beforeInstance(() => {
-  this.next
+  this.next()
   // triggers the next advice or method in the
   // call stack (mandatory if your advice contains async operations)
-  this.stop // prevent execution of decorated method (GUESS WHY)
+  this.stop() // prevent execution of decorated method (GUESS WHY)
   this.stopped // boolean, will evaluate to true if stop() was called
 })
 ```
@@ -121,15 +121,15 @@ Join points allow you to plug Advices into parts of your code.
 @beforeInstance // class accepts <B = any>
 ```
 
-#### Comunication between advices or decorated method (metadata)
+#### Comunication between Advices or decorated method (metadata)
 
-Advices plugged in the same callstack share **arguments** and **result**
-Advices plugged in the same class share its static context
-Advices plugged in the same class instance share that instance context
+- Advices plugged in the same callstack share **arguments** and **result**
+- Advices plugged in static methods share its static context
+- Advices plugged in non static methods share static and instance context
 
 ### receiving params
 
-An advice have access to the original method/instance by [accessing its metadata](#metadata). But advices can be parametrized too:
+An Advice have access to the original method/instance by [accessing its metadata](#metadata). But Advices can be parametrized too:
 
 ##### By closure reference
 ```typescript
@@ -153,7 +153,7 @@ class Person {
 
 import { AdvicePool, adviceMetadata } from 'kaop-ts'
 
-// retrieved using `@adviceParam` decorator in the advice
+// retrieved using `@adviceParam` decorator in the Advice
 export class Registry extends AdvicePool {
   static log (@adviceParam(0) path, @adviceParam(1) num) {
     path // "log/file/path"
@@ -203,7 +203,7 @@ export class PersistanceAdvices extends AdvicePool {
 }
 ```
 
-The following example uses 2 advices, the first one is asynchronous, while the second not. The second one needs to be called right after `read` has finished:
+The following example uses 2 Advices, the first one is asynchronous, while the second not. The second one needs to be called right after `read` has finished:
 
 ```typescript
 // view.ts
@@ -233,7 +233,7 @@ export class PersistanceAdvices extends AdvicePool {
 }
 ```
 
-Be careful, since async advices return `undefined`
+Be careful, since decorated methods with **async Advices** return `undefined`
 
 ### Tips
 
@@ -288,11 +288,11 @@ Check out the [reasons and workaround](https://github.com/k1r0s/kaop-ts/issues/5
 
 #####  Do not reassign methods or use decorators on arrow functions (i.e.: public something = () => {})
 
-kaop-ts uses metadata properties inside methods or classes. If you alter that references by reasignment you'll mess advice call stack.
+kaop-ts uses metadata properties inside methods or classes. If you alter that references by reasignment you'll mess Advice call stack.
 
-#####  Avoid async advices with some frameworks functions (i.e.: React `render` function)
+#####  Avoid async Advices with some frameworks functions (i.e.: React `render` function)
 
-Careful when adding async advices to some frameworks functions, let's say `render` method of React component. In this case, the method will be evaluated as `undefined` messing up React rendering.
+Careful when adding async Advices to some frameworks functions, let's say `render` method of React component. In this case, the method will be evaluated as `undefined` messing up React rendering.
 
 ### Resources
 
