@@ -15,7 +15,7 @@ Lightweight, modular, framework agnostic and **easy to use** AOP library written
 ```bash
 npm install kaop-ts
 ```
-Use a [join point](#join-points) to plug it to any method/class:
+Use a [join point](#available-join-points) to plug it to any method/class:
 
 ```typescript
 import { afterMethod } from 'kaop-ts'
