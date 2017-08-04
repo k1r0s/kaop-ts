@@ -8,26 +8,13 @@
 [![downloads](https://img.shields.io/npm/dm/kaop-ts.svg)](https://www.npmjs.com/package/kaop-ts)
 [![Known Vulnerabilities](https://snyk.io/test/npm/kaop-ts/badge.svg)](https://snyk.io/test/npm/kaop-ts)
 
-Lightweight, framework agnostic and easy to use AOP library written in TypeScript that takes advantage of ES2016 Decorators.
+Lightweight, modular, framework agnostic and **easy to use** AOP library written in TypeScript that takes advantage of ES2016 Decorators.
 
 ### Get started
 
 ```bash
 npm install kaop-ts
 ```
-
-Create a simple advice:
-
-```typescript
-import { AdvicePool, adviceMetadata } from 'kaop-ts'
-
-export class MyAdvices extends AdvicePool {
-  static doubleResult (@adviceMetadata metadata) {
-    metadata.result *= 2
-  }
-}
-```
-
 Use a [join point](#join-points) to plug it to any method/class:
 
 ```typescript
@@ -36,7 +23,7 @@ import { MyAdvices } from './somewhere'
 
 class DummyExample {
 
-  @afterMethod(MyAdvices.doubleResult)
+  @afterMethod((meta) => meta.result * 2)
   static calculateSomething (num, num2) {
     return num * num2
   }
@@ -48,24 +35,125 @@ DummyExample.calculateSomething(5, 5) // 50
 
 ### Usage
 
-#### Advice
+#### How do I define an advice?
 
-An advice must be implemented as a class that extends `AdvicePool`. They have access to the original method/instance by [accessing its metadata](#metadata).
+###### as an anonymous function:
+```typescript
+@beforeInstance(() => {
+  // stuff
+})
+```
+###### as an alias:
+```typescript
+const myCustomAdvice = beforeInstance(() => {
+  // stuff
+})
 
-They can receive **parameters** passed through the join points:
+@myCustomAdvice
+```
+###### as an expression:
+```typescript
+const myCustomAdvice = (...args) => {
+  beforeInstance(() => {
+    // stuff
+  })
+}
+
+@myCustomAdvice(arg0, arg1)
+```
+###### with generics:
+```typescript
+const myCustomAdvice = beforeInstance<Type1, 'method'>(() => {
+  // stuff
+})
+
+@myCustomAdvice // can only used at Type1::method
+```
+###### (old) as a static property of class that extends `AdvicePool`:
+```typescript
+class MyAdvices extends AdvicePool {
+  static myCustomAdvice(meta) {
+    // stuff
+  }
+}
+
+@beforeMethod(MyAdvices.myCustomAdvice)
+```
+
+
+### API
+
+#### Metadata
 
 ```typescript
+@beforeInstance((meta) => {
+  meta.args // Arguments to be received by decorated method
+  meta.propertyKey // Name of the decorated method as string
+  meta.scope // Instance or the context of the call stack
+  meta.rawMethod // Original method
+  meta.target // Class definition
+  meta.result // The returned value by the method
+})
+```
+
+#### Advice context `this`
+
+```typescript
+@beforeInstance(() => {
+  this.next
+  // triggers the next advice or method in the
+  // call stack (mandatory if your advice contains async operations)
+  this.stop // prevent execution of decorated method (GUESS WHY)
+  this.stopped // boolean, will evaluate to true if stop() was called
+})
+```
+
+#### Available Join Points
+
+Join points allow you to plug Advices into parts of your code.
+
+```typescript
+@afterMethod // method accepts <B = any, K extends keyof B = any>
+@beforeMethod // method accepts <B = any, K extends keyof B = any>
+@onException // method accepts <B = any, K extends keyof B = any>
+
+@afterInstance // class accepts <B = any>
+@beforeInstance // class accepts <B = any>
+```
+
+#### Comunication between advices or decorated method (metadata)
+
+Advices plugged in the same callstack share **arguments** and **result**
+Advices plugged in the same class share its static context
+Advices plugged in the same class instance share that instance context
+
+### receiving params
+
+An advice have access to the original method/instance by [accessing its metadata](#metadata). But advices can be parametrized too:
+
+##### By closure reference
+```typescript
+
+const log = (path, num) => {
+  return afterMethod((meta) => {
+    path // "log/file/path"
+    num // 31
+  })
+}
+
 class Person {
-  @afterMethod(Registry.log, 'log/file/path', 31, {what: 'ever'})
+  // passed through join point
+  @log('log/file/path', 31, {what: 'ever'})
   getAge() { ... }
 }
 ```
 
-Then retrieved using `@adviceParam` decorator in the advice:
-
+##### Through join point
 ```typescript
+
 import { AdvicePool, adviceMetadata } from 'kaop-ts'
 
+// retrieved using `@adviceParam` decorator in the advice
 export class Registry extends AdvicePool {
   static log (@adviceParam(0) path, @adviceParam(1) num) {
     path // "log/file/path"
@@ -73,36 +161,14 @@ export class Registry extends AdvicePool {
     ...
   }
 }
-```
-
-#### Join Points
-
-Join points allow you to plug Advices into parts of your code.
-
-```typescript
-@afterMethod // method
-@beforeMethod // method
-@onException // method
-
-@afterInstance // class
-@beforeInstance // class
-```
-
-You can create **aliases**:
-
-```typescript
-import { afterMethod } from 'kaop-ts'
-const log = afterMethod(Advices.log, 'whateverParam')
 
 class Person {
-  @log
-  getAge(){
-    ...
-  }
+  // passed through join point
+  @afterMethod(Registry.log, 'log/file/path', 31, {what: 'ever'})
+  getAge() { ... }
 }
 ```
-
-#### Call Stack
+## Call Stack
 
 You can place many join points, they'll be executed sequentially, from top to bottom.
 
@@ -119,22 +185,6 @@ class Component {
 
 You have control over this call stack, for example you can also create [Async Advices](#async-advices).
 
-#### Metadata
-
-```typescript
-import { AdvicePool, adviceMetadata, IMetadata } from 'kaop-ts'
-
-export class Registry extends AdvicePool {
-  static log (@adviceMetadata meta: IMetadata) {
-    meta.args // Arguments to be received by decorated method
-    meta.propertyKey // Name of the decorated method as string
-    meta.scope // Instance or the context of the call stack
-    meta.rawMethod // Original method (contains metadata)
-    meta.target // Class definition
-    meta.result // The returned value by the method
-  }
-}
-```
 
 _Note:_ you might find an `IMetadata was not found in 'kaop-ts'` issue. See [Troubleshooting](#troubleshooting) section for more info.
 
@@ -207,7 +257,7 @@ At first we did not support Babel because they drop support for decorators (year
 
 Of course we're going to provide support for Babel users, but think that kaop-ts is intended to work with Typescript. If Babel team implements decorators proposal as it fit it will be good for us also. Please refer here: https://github.com/babel/proposals/issues/13
 
-You should have this `.babelrc` setup: 
+You should have this `.babelrc` setup:
 
 ```
 {
