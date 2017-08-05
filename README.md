@@ -63,7 +63,7 @@ const myCustomAdvice = (...args) => {
 ```
 ###### with generics:
 ```typescript
-const myCustomAdvice = beforeInstance<Type1, 'method'>(() => {
+const myCustomAdvice = beforeMethod<Type1, 'method'>(() => {
   // stuff
 })
 
