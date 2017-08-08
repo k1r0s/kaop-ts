@@ -38,15 +38,15 @@ DummyExample.calculateSomething(5, 5) // 50
 
 #### How do I define an Advice?
 
-###### as an anonymous function:
+###### as an anonymous function ([do not use lambda here!](https://github.com/k1r0s/kaop-ts/issues/18)):
 ```typescript
-@beforeInstance(() => {
+@beforeInstance(function() {
   // stuff
 })
 ```
 ###### as an alias:
 ```typescript
-const myCustomAdvice = beforeInstance(() => {
+const myCustomAdvice = beforeInstance(function() {
   // stuff
 })
 
@@ -55,7 +55,7 @@ const myCustomAdvice = beforeInstance(() => {
 ###### as an expression:
 ```typescript
 const myCustomAdvice = (...args) => {
-  beforeInstance(() => {
+  return beforeInstance(function() {
     // stuff
   })
 }
@@ -64,13 +64,13 @@ const myCustomAdvice = (...args) => {
 ```
 ###### with generics:
 ```typescript
-const myCustomAdvice = beforeMethod<Type1, 'method'>(() => {
+const myCustomAdvice = beforeMethod<Type1, 'method'>(function() {
   // stuff
 })
 
 @myCustomAdvice // can only used at Type1::method
 ```
-###### (old) as a static property of class that extends `AdvicePool`:
+###### (old fashioned) as a static property of class that extends `AdvicePool`:
 ```typescript
 class MyAdvices extends AdvicePool {
   static myCustomAdvice(meta) {
@@ -87,7 +87,7 @@ class MyAdvices extends AdvicePool {
 #### Metadata
 
 ```typescript
-@beforeInstance((meta) => {
+@beforeInstance(function(meta) {
   meta.args // Arguments to be received by decorated method
   meta.propertyKey // Name of the decorated method as string
   meta.scope // Instance or the context of the call stack
@@ -100,7 +100,7 @@ class MyAdvices extends AdvicePool {
 #### Advice context `this`
 
 ```typescript
-@beforeInstance(() => {
+@beforeInstance(function() {
   this.next()
   // triggers the next advice or method in the
   // call stack (mandatory if your advice contains async operations)
@@ -136,7 +136,7 @@ An Advice have access to the original method/instance by [accessing its metadata
 ```typescript
 
 const log = (path, num) => {
-  return afterMethod((meta) => {
+  return afterMethod(function(meta) {
     path // "log/file/path"
     num // 31
   })
