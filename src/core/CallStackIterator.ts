@@ -1,7 +1,7 @@
 import { IStackEntry } from "../interface/IStackEntry"
 import { IMetadata } from "../interface/IMetadata"
 import { MetadataKey } from "./MetadataKeys"
-import "reflect-metadata"
+import { getMetadata, defineMetadata } from 'core-js/library/es7/reflect'
 
 /**
  * {class} CallStackIterator
@@ -28,7 +28,7 @@ export class CallStackIterator {
    * next - this method will resolve by calling the next advice in the call stack
    * or calling the main method
    */
-  public next () {
+  private next () {
 
     // increment index used to retrieve following entry
     this.index++
@@ -70,7 +70,7 @@ export class CallStackIterator {
    * stop - this method will alter stopped property of this stack which will
    * prevent main method to be invoked
    */
-  public stop () {
+  private stop () {
     this.stopped = true
   }
 
@@ -103,8 +103,8 @@ export class CallStackIterator {
   private transformArguments (stackEntry: IStackEntry): any[] {
 
     const transformedArguments = []
-    const reflectAdviceParams: number[] = Reflect.getMetadata(MetadataKey.ADVICE_PARAMS, stackEntry.adviceFn)
-    const reflectMetaParam: number = Reflect.getMetadata(MetadataKey.METADATA_PARAM, stackEntry.adviceFn)
+    const reflectAdviceParams: number[] = getMetadata(MetadataKey.ADVICE_PARAMS, stackEntry.adviceFn)
+    const reflectMetaParam: number = getMetadata(MetadataKey.METADATA_PARAM, stackEntry.adviceFn)
 
     // if stackEntry.advice.$$params evals is an Array means that the user
     // implemented @adviceParams

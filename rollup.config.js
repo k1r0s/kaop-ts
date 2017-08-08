@@ -16,7 +16,11 @@ export default {
   external: [],
   plugins: [
     // Allow bundling cjs modules (unlike webpack, rollup doesn't undestand cjs)
-    commonjs(),
+    commonjs({
+      namedExports: {
+        './node_modules/core-js/library/es7/reflect.js': ['getMetadata', 'defineMetadata']
+      }
+    }),
      // Allow node_modules resolution, so you can use 'external' to control
      // which external modules to include in the bundle
     resolve()

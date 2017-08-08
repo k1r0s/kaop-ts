@@ -96,6 +96,7 @@
     "validate-commit-msg": "^2.10.1"
   },
   "dependencies": {
-    "reflect-metadata": "^0.1.10"
+    "@types/core-js": "^0.9.42",
+    "core-js": "^2.5.0"
   }
 }
