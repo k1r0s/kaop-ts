@@ -9,7 +9,7 @@
 [![downloads](https://img.shields.io/npm/dm/kaop-ts.svg)](https://www.npmjs.com/package/kaop-ts)
 [![Known Vulnerabilities](https://snyk.io/test/npm/kaop-ts/badge.svg)](https://snyk.io/test/npm/kaop-ts)
 
-Lightweight, modular, framework agnostic and **easy to use** AOP library written in TypeScript that takes advantage of ES2016 Decorators.
+Lightweight, modular, framework agnostic and **easy to use** AOP library written in TypeScript that takes advantage of ES2016 Decorators. Aspect Oriented Programming is a tool to change, extend, modify the behavior of methods and constructors non-invasively. If you have any doupt about this tecnique check the [resources](#resources).
 
 ### Get started
 
@@ -20,7 +20,6 @@ Use a [join point](#available-join-points) to plug it to any method/class:
 
 ```typescript
 import { afterMethod } from 'kaop-ts'
-import { MyAdvices } from './somewhere'
 
 class DummyExample {
 
@@ -38,7 +37,7 @@ DummyExample.calculateSomething(5, 5) // 50
 
 #### How do I define an Advice?
 
-###### as an anonymous function ([do not use lambda here!](https://github.com/k1r0s/kaop-ts/issues/18)):
+###### as an anonymous function ([warning about lambda!](https://github.com/k1r0s/kaop-ts/issues/18)):
 ```typescript
 @beforeInstance(function() {
   // stuff
@@ -297,9 +296,17 @@ Careful when adding async Advices to some frameworks functions, let's say `rende
 
 ### Resources
 
+- [Working example about AOP with Angular 2+](https://github.com/k1r0s/angular2-aop-showcase)
+- [Aspect Oriented Programming in Javascript (ES5+\Typescript)](https://hackernoon.com/aspect-oriented-programming-in-javascript-es5-typescript-d751dda576d0)
+- [How To Handle Exceptions With Aspect Programming And Blame Covfefe](https://hackernoon.com/today-im-gonna-show-you-a-brief-yet-useful-example-about-aspect-oriented-programming-b79b2cede864)
 - [kaop ES5 version](https://github.com/k1r0s/kaop)
 - [Slides about AOP](https://k1r0s.github.io/aop-intro/)
 
 ### Credits
 
 Made using [TypeScript Library Starter](https://github.com/alexjoverm/typescript-library-starter/)
+
+### Similar resources
+
+- [mgechev/aspect.js](https://github.com/mgechev/aspect.js)
+- [cujojs/meld](https://github.com/cujojs/meld)
