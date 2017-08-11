@@ -13,6 +13,7 @@ export class CallStackIterator {
 
   private index: number = -1
   private stopped: boolean = false
+  private broken: boolean = false
 
   /**
    * {constructor}
@@ -34,7 +35,7 @@ export class CallStackIterator {
     this.index++
 
     // asign currentEntry to the following entry
-    let currentEntry = this.stack[this.index]
+    let currentEntry = this.broken ? null : this.stack[this.index]
 
     // currentEntry evals to 'null' meaning that the next entry is invoke main method.
     // but it will be skipped if 'this.stopped' evals to 'true' (this.stop was invoked)
@@ -56,7 +57,9 @@ export class CallStackIterator {
           }
         }
       }
-      this.next()
+      if (!this.broken) {
+        this.next()
+      }
     }
 
     // if currentEntry has a value, it must be an entry/advice descriptor
@@ -74,6 +77,20 @@ export class CallStackIterator {
     this.stopped = true
   }
 
+  /**
+   * this method will prevent all following advices to be called by
+   * removing them from call stack queue
+   */
+  private break () {
+    this.broken = true
+  }
+
+  /**
+   * @private executeAdvice
+   * this method executes de current advice on the current context, if the advice is not
+   * `asynchronous`, it will call next() on finish.
+   * @param currentEntry
+   */
   private executeAdvice (currentEntry: IStackEntry) {
     currentEntry.adviceFn.apply(this, this.transformArguments(currentEntry))
     if (!this.isAsync(currentEntry.adviceFn)) {

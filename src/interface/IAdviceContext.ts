@@ -6,5 +6,6 @@
 export interface IAdviceContext {
   stopped: boolean
   next (): void
+  break (): void
   stop (): void
 }
