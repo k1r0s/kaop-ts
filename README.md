@@ -13,6 +13,8 @@ Lightweight, modular, framework agnostic and **easy to use** AOP library written
 
 ### Get started
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/k1r0s/kaop-ts.svg)](https://greenkeeper.io/)
+
 ```bash
 npm install kaop-ts
 ```
