@@ -1,8 +1,8 @@
-import { CallStackIterator } from '../src/core/CallStackIterator'
-import { IStackEntry } from '../src/interface/IStackEntry'
+import { CallStackIterator } from "../src/core/CallStackIterator"
+import { IStackEntry } from "../src/interface/IStackEntry"
 import { AdvicePool, IMetadata } from "../src/kaop-ts"
 
-describe('CallStackIterator', () => {
+describe("CallStackIterator", () => {
 
   const spies = {
     isAsync: jest.fn(),
@@ -12,15 +12,15 @@ describe('CallStackIterator', () => {
   class MyAdvice extends AdvicePool {
     static isNotAsync () {
       // this.next
-      const a = 'this.next'
+      const a = "this.next"
       spies.isNotAsync()
     }
   }
 
   const metadata: IMetadata = {
-    scope: { name: 'pepe' },
+    scope: { name: "pepe" },
     target: {},
-    propertyKey: 'test',
+    propertyKey: "test",
     exception: null,
     rawMethod: jest.fn(),
     args: [],
@@ -39,17 +39,17 @@ describe('CallStackIterator', () => {
     spies.isNotAsync.mockClear()
   })
 
-  it('Is instantiable', () => {
+  it("Is instantiable", () => {
     expect(iterator).toBeDefined()
     expect(iterator).toBeInstanceOf(CallStackIterator)
   })
 
-  it('Calls the original method if the current entry is null', () => {
+  it("Calls the original method if the current entry is null", () => {
     iterator = new CallStackIterator(metadata, stackEntries)
     expect(metadata.rawMethod).toHaveBeenCalledTimes(1)
   })
 
-  it('Calls an advice if the current entry is not null', () => {
+  it("Calls an advice if the current entry is not null", () => {
     const entries: IStackEntry[] = [{ adviceFn: advice, args: [] }]
     iterator = new CallStackIterator(metadata, entries)
     expect(metadata.rawMethod).not.toBeCalled()

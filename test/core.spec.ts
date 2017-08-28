@@ -4,7 +4,7 @@ import { CallStackIterator } from "../src/core/CallStackIterator"
 
 import { IMetadata } from "../src/interface/IMetadata"
 import { IStackEntry } from "../src/interface/IStackEntry"
-import { adviceParam } from '../src/decorators';
+import { adviceParam } from "../src/decorators"
 
 const Person = function () {}
 Person.prototype.setName = function() {}

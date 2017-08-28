@@ -1,7 +1,7 @@
 import { IStackEntry } from "../interface/IStackEntry"
 import { IMetadata } from "../interface/IMetadata"
 import { MetadataKey } from "./MetadataKeys"
-import { getMetadata, defineMetadata } from 'core-js/library/es7/reflect'
+import { getMetadata, defineMetadata } from "core-js/library/es7/reflect"
 
 /**
  * {class} CallStackIterator

@@ -5,7 +5,7 @@ import { IAdviceSignature } from "./interface/IAdviceSignature"
 import { IStackEntry } from "./interface/IStackEntry"
 import { IMetadata } from "./interface/IMetadata"
 import { MetadataKey } from "./core/MetadataKeys"
-import { getMetadata, defineMetadata } from 'core-js/library/es7/reflect';
+import { getMetadata, defineMetadata } from "core-js/library/es7/reflect";
 
 
 /**

@@ -1,7 +1,7 @@
 import { CallStackIterator } from "./CallStackIterator"
 import { IMetadata } from "../interface/IMetadata"
 import { MetadataKey } from "./MetadataKeys"
-import { getMetadata, defineMetadata } from 'core-js/library/es7/reflect'
+import { getMetadata, defineMetadata } from "core-js/library/es7/reflect"
 
 /**
  * @function bootstrap - this function replaces|wraps the given method (that was decorated)

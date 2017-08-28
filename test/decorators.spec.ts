@@ -1,6 +1,6 @@
 import { adviceMetadata, adviceParam } from "../src/decorators"
-import { MetadataKey } from '../src/core/MetadataKeys';
-import { getMetadata, defineMetadata } from 'core-js/library/es6/reflect';
+import { MetadataKey } from "../src/core/MetadataKeys"
+import { getMetadata, defineMetadata } from "core-js/library/es6/reflect"
 describe(`
 adviceMetadata decorator should be used to represent the position where metadata
 must be injected as a param within an advice
