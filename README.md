@@ -38,13 +38,13 @@ DummyExample.calculateSomething(5, 5) // 50
 
 #### How do I define an Advice?
 
-###### as an anonymous function ([warning about lambda!](https://github.com/k1r0s/kaop-ts/issues/18)):
+###### As an anonymous function ([warning about lambda!](https://github.com/k1r0s/kaop-ts/issues/18)):
 ```typescript
 @beforeInstance(function() {
   // stuff
 })
 ```
-###### as an alias:
+###### As an alias:
 ```typescript
 const myCustomAdvice = beforeInstance(function() {
   // stuff
@@ -52,7 +52,7 @@ const myCustomAdvice = beforeInstance(function() {
 
 @myCustomAdvice
 ```
-###### as an expression:
+###### As an expression:
 ```typescript
 const myCustomAdvice = (...args) => {
   return beforeInstance(function() {
@@ -62,7 +62,7 @@ const myCustomAdvice = (...args) => {
 
 @myCustomAdvice(arg0, arg1)
 ```
-###### with generics:
+###### Using generics:
 ```typescript
 const myCustomAdvice = beforeMethod<Type1, 'method'>(function() {
   // stuff
@@ -70,7 +70,7 @@ const myCustomAdvice = beforeMethod<Type1, 'method'>(function() {
 
 @myCustomAdvice // can only used at Type1::method
 ```
-###### (old fashioned) as a static property of class that extends `AdvicePool`:
+###### (Old fashioned) As a static property of class that extends `AdvicePool`:
 ```typescript
 class MyAdvices extends AdvicePool {
   static myCustomAdvice(meta) {
@@ -128,7 +128,7 @@ Join points allow you to plug Advices into parts of your code.
 - Advices plugged in static methods share its static context
 - Advices plugged in non static methods share static and instance context
 
-### receiving params
+### Receiving params
 
 An Advice have access to the original method/instance by [accessing its metadata](#metadata). But Advices can be parametrized too:
 
