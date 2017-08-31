@@ -105,6 +105,7 @@ class MyAdvices extends AdvicePool {
   // triggers the next advice or method in the
   // call stack (mandatory if your advice contains async operations)
   this.stop() // prevent execution of decorated method (GUESS WHY)
+  this.break() // prevent execution of following advices until method execution
   this.stopped // boolean, will evaluate to true if stop() was called
 })
 ```
@@ -121,6 +122,8 @@ Join points allow you to plug Advices into parts of your code.
 @afterInstance // class accepts <B = any>
 @beforeInstance // class accepts <B = any>
 ```
+
+Join points provide two generic placeholder to enhace strong typings. Check out [angular 2 example:](https://github.com/k1r0s/angular2-aop-showcase/blob/master/src/app/behaviors/resource-container.ts)
 
 #### Comunication between Advices or decorated method (metadata)
 
