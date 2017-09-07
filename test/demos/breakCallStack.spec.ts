@@ -10,7 +10,7 @@ class YetAnotherDummyTest {
   @beforeMethod(function (meta) { meta.target.something++ })
   @afterMethod(function (meta) { throw new Error(`I also shouldn't be called!!!11`) })
   @afterMethod(function (meta) { meta.target.something++ })
-  static some () { console.log('hi') }
+  static some () { console.log("hi") }
 }
 
 describe("kaop-ts demo -> break call stack if needed", () => {
