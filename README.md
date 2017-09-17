@@ -54,7 +54,7 @@ const myCustomAdvice = beforeInstance(function() {
 ```
 ###### As an expression:
 ```typescript
-const myCustomAdvice = (...args) => {
+const myCustomAdvice = function(...args) {
   return beforeInstance(function() {
     // stuff
   })
@@ -62,13 +62,13 @@ const myCustomAdvice = (...args) => {
 
 @myCustomAdvice(arg0, arg1)
 ```
-###### Using generics:
+###### Using TypeScript generics:
 ```typescript
-const myCustomAdvice = beforeMethod<Type1, 'method'>(function() {
+const myCustomAdvice = beforeMethod<MyComponent, 'ngOnInit'>(function() {
   // stuff
 })
 
-@myCustomAdvice // can only used at Type1::method
+@myCustomAdvice // can only used at MyComponent::ngOnInit
 ```
 ###### (Old fashioned) As a static property of class that extends `AdvicePool`:
 ```typescript
