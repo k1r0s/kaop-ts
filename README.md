@@ -301,6 +301,7 @@ Careful when adding async Advices to some frameworks functions, let's say `rende
 ### Resources
 
 - [Working example about AOP with Angular 2+](https://github.com/k1r0s/angular2-aop-showcase)
+- [Article about Angular2+, Decorators and SRP](https://hackernoon.com/angular-tutorial-separation-of-concerns-using-es7-decorators-ed6c9756265)
 - [Aspect Oriented Programming in Javascript (ES5+\Typescript)](https://hackernoon.com/aspect-oriented-programming-in-javascript-es5-typescript-d751dda576d0)
 - [How To Handle Exceptions With Aspect Programming And Blame Covfefe](https://hackernoon.com/today-im-gonna-show-you-a-brief-yet-useful-example-about-aspect-oriented-programming-b79b2cede864)
 - [kaop ES5 version](https://github.com/k1r0s/kaop)
