@@ -68,7 +68,7 @@ const myCustomAdvice = beforeMethod<MyComponent, 'ngOnInit'>(function() {
   // stuff
 })
 
-@myCustomAdvice // can only used at MyComponent::ngOnInit
+@myCustomAdvice // can only be used at MyComponent::ngOnInit
 ```
 ###### (Old fashioned) As a static property of class that extends `AdvicePool`:
 ```typescript
