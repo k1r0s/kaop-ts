@@ -207,7 +207,7 @@ export class PersistanceAdvices extends AdvicePool {
 }
 ```
 
-The following example uses 2 Advices, the first one is asynchronous, while the second not. The second one needs to be called right after `read` has finished:
+The following example uses 2 Advices: the first one is asynchronous, while the second not. The second one needs to be called right after `read` has finished:
 
 ```typescript
 // view.ts
@@ -263,9 +263,9 @@ https://github.com/k1r0s/kaop-ts/issues/34
 
 ##### Babel
 
-At first we did not support Babel because they drop support for decorators (year ago).. nowadays they're going to fully implement this proposal, but still we're waiting..
+At first we did not support Babel because they drop support for decorators (year ago, by the time of writing)... nowadays they're going to fully implement this proposal, but still we're waiting...
 
-Of course we're going to provide support for Babel users, but think that kaop-ts is intended to work with Typescript. If Babel team implements decorators proposal as it fit it will be good for us also. Please refer here: https://github.com/babel/proposals/issues/13
+Of course we're going to provide support for Babel users, but think that kaop-ts is intended to work with TypeScript. If Babel team implements decorators proposal as it fit it will be good for us also. Please refer here: https://github.com/babel/proposals/issues/13
 
 You should have this `.babelrc` setup:
 
