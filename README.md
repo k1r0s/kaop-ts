@@ -24,7 +24,7 @@ import { afterMethod } from 'kaop-ts'
 
 class DummyExample {
 
-  @afterMethod((meta) => meta.result * 2)
+  @afterMethod(function(meta) { meta.result * 2 })
   static calculateSomething (num, num2) {
     return num * num2
   }
@@ -52,6 +52,7 @@ DummyExample.calculateSomething(5, 5) // 50
   - [Call-stack](/docs/api.md#call-stack)
     - [Async Advices](/docs/api.md#async-advices)
 - [Troubleshooting](/docs/faq.md)
+  - [Warning about Lambda fn](/docs/faq.md#discourage-about-arrow-functions-in-advice-declaration)
   - [Babel param decorators](/docs/faq.md#babel-param-decorators)
   - [export 'IMetadata' was not found in 'kaop-ts'](/docs/faq.md#imetadata-was-not-found-in-kaop-ts)
   - [Decorated methods should be class members instead properties](/docs/faq.md#do-not-reassign-methods-or-use-decorators-on-arrow-functions-ie-public-something----)

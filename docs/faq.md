@@ -1,3 +1,9 @@
+### Discourage about arrow functions in advice declaration
+
+Briefly advices have its own context meaning that you should not define an Advice using an arrow function just because you need `this` to be pointing to the advice context. If you need to access to the decorated instance you should use `Metadata.scope` property.
+
+Check this issue for more in deep information: https://github.com/k1r0s/kaop-ts/issues/18
+
 ### Babel param decorators
 
 At first we did not support Babel because they drop support for decorators (year ago, by the time of writing)... nowadays they're going to fully implement this proposal, but still we're waiting...
