@@ -34,279 +34,40 @@ DummyExample.calculateSomething(3, 3) // 18
 DummyExample.calculateSomething(5, 5) // 50
 ```
 
-### Usage
+### Docs
+
+- [Docs](/docs/api.md)
+  - [Define an Advice](/docs/api.md#how-do-i-define-an-advice)
+    - [As an anonymous function](/docs/api.md#as-an-anonymous-function-warning-about-lambda)
+    - [As an alias](/docs/api.md#as-an-alias)
+    - [Using TypeScript generics](/docs/api.md#using-typescript-generics)
+    - [As a static property of class](/docs/api.md#old-fashioned-as-a-static-property-of-class-that-extends-advicepool)
+  - [Metadata Object](/docs/api.md#metadata)
+  - [Advice Context `this`](/docs/api.md#advice-context-this)
+  - [Join Points](/docs/api.md#available-join-points)
+  - [Comunication between Advices](/docs/api.md#comunication-between-advices-or-decorated-method-metadata)
+  - [Parametrized Advices](/docs/api.md#receiving-params)
+    - [By Closure ref](/docs/api.md#by-closure-reference)
+    - [Through Join Point](/docs/api.md#through-join-point)
+  - [Call-stack](/docs/api.md#call-stack)
+    - [Async Advices](/docs/api.md#async-advices)
+- [Troubleshooting](/docs/faq.md)
+  - [Babel param decorators](/docs/faq.md#babel-param-decorators)
+  - [export 'IMetadata' was not found in 'kaop-ts'](/docs/faq.md#imetadata-was-not-found-in-kaop-ts)
+  - [Decorated methods should be class members instead properties](/docs/faq.md#do-not-reassign-methods-or-use-decorators-on-arrow-functions-ie-public-something----)
+  - [Warning about Async Advices](/docs/faq.md#avoid-async-advices-with-some-frameworks-functions-ie-react-render-function)
+- [Community ideas/contributions](/docs/community.md)
+  - @jcjolley [ES7 Async/Await Support](/docs/community.md#es7-asyncawait-support)
+  - @alexjoverm [onException Join Point](https://github.com/k1r0s/kaop-ts/pull/4)
+- [Some Examples](/docs/examples.md)
+  - [Working example about AOP/SRP with Angular 2+](https://github.com/k1r0s/angular2-srp-showcase)
+  - [Log decorator implementation](/docs/examples.md#log-decorator)
+  - [Http decorator using axios](/docs/examples.md#http-decorator)
+  - [Preact scoped stylesheet decorator](/docs/examples.md#preact-scoped-stylesheet-decorator)
 
-#### How do I define an Advice?
-
-###### As an anonymous function ([warning about lambda!](https://github.com/k1r0s/kaop-ts/issues/18)):
-```typescript
-@beforeInstance(function() {
-  // stuff
-})
-```
-###### As an alias:
-```typescript
-const myCustomAdvice = beforeInstance(function() {
-  // stuff
-})
-
-@myCustomAdvice
-```
-###### As an expression:
-```typescript
-const myCustomAdvice = function(...args) {
-  return beforeInstance(function() {
-    // stuff
-  })
-}
-
-@myCustomAdvice(arg0, arg1)
-```
-###### Using TypeScript generics:
-```typescript
-const myCustomAdvice = beforeMethod<MyComponent, 'ngOnInit'>(function() {
-  // stuff
-})
-
-@myCustomAdvice // can only be used at MyComponent::ngOnInit
-```
-###### (Old fashioned) As a static property of class that extends `AdvicePool`:
-```typescript
-class MyAdvices extends AdvicePool {
-  static myCustomAdvice(meta) {
-    // stuff
-  }
-}
-
-@beforeMethod(MyAdvices.myCustomAdvice)
-```
-
-
-### API
-
-#### Metadata
-
-```typescript
-@beforeInstance(function(meta) {
-  meta.args // Arguments to be received by decorated method
-  meta.propertyKey // Name of the decorated method as string
-  meta.scope // Instance or the context of the call stack
-  meta.rawMethod // Original method
-  meta.target // Class definition
-  meta.result // The returned value by the method
-})
-```
-
-#### Advice context `this`
-
-```typescript
-@beforeInstance(function() {
-  this.next()
-  // triggers the next advice or method in the
-  // call stack (mandatory if your advice contains async operations)
-  this.stop() // prevent execution of decorated method (GUESS WHY)
-  this.break() // prevent execution of following advices until method execution
-  this.stopped // boolean, will evaluate to true if stop() was called
-})
-```
-
-#### Available Join Points
-
-Join points allow you to plug Advices into parts of your code.
-
-```typescript
-@afterMethod // method accepts <B = any, K extends keyof B = any>
-@beforeMethod // method accepts <B = any, K extends keyof B = any>
-@onException // method accepts <B = any, K extends keyof B = any>
-
-@afterInstance // class accepts <B = any>
-@beforeInstance // class accepts <B = any>
-```
-
-Join points provide two generic placeholder to enhace strong typings. Check out [angular 2 example:](https://github.com/k1r0s/angular2-aop-showcase/blob/master/src/app/behaviors/resource-container.ts)
-
-#### Comunication between Advices or decorated method (metadata)
-
-- Advices plugged in the same callstack share **arguments** and **result**
-- Advices plugged in static methods share its static context
-- Advices plugged in non static methods share static and instance context
-
-### Receiving params
-
-An Advice have access to the original method/instance by [accessing its metadata](#metadata). But Advices can be parametrized too:
-
-##### By closure reference
-```typescript
-
-const log = (path, num) => {
-  return afterMethod(function(meta) {
-    path // "log/file/path"
-    num // 31
-  })
-}
-
-class Person {
-  // passed through join point
-  @log('log/file/path', 31, {what: 'ever'})
-  getAge() { ... }
-}
-```
-
-##### Through join point
-```typescript
-
-import { AdvicePool, adviceMetadata } from 'kaop-ts'
-
-// retrieved using `@adviceParam` decorator in the Advice
-export class Registry extends AdvicePool {
-  static log (@adviceParam(0) path, @adviceParam(1) num) {
-    path // "log/file/path"
-    num // 31
-    ...
-  }
-}
-
-class Person {
-  // passed through join point
-  @afterMethod(Registry.log, 'log/file/path', 31, {what: 'ever'})
-  getAge() { ... }
-}
-```
-## Call Stack
-
-You can place many join points, they'll be executed sequentially, from top to bottom.
-
-```typescript
-class Component {
-  ...
-  @beforeMethod(YourHttpService.getCached, '/url/to/html')
-  @beforeMethod(YourHtmlParser.template)
-  invalidate (parsedHtml?: any) {
-    this.element.append(parsedHtml)
-  }
-}
-```
-
-You have control over this call stack, for example you can also create [Async Advices](#async-advices).
-
-
-_Note:_ you might find an `IMetadata was not found in 'kaop-ts'` issue. See [Troubleshooting](#troubleshooting) section for more info.
-
-#### Async advices
-
-By default, advices are synchronous, unless you use `this.next()` in your code. Then it is asynchronous and the flow will not continue until `this.next()` is called.
-
-```typescript
-import { AdvicePool } from 'kaop-ts'
-
-export class PersistanceAdvices extends AdvicePool {
-  static save () {
-    ...
-    this.next() // It must be called and reachable, otherwise the flow hangs
-  }
-}
-```
-
-The following example uses 2 Advices: the first one is asynchronous, while the second not. The second one needs to be called right after `read` has finished:
-
-```typescript
-// view.ts
-import { beforeMethod } from 'kaop-ts'
-import { PersistanceAdvices } from './persistance-advices'
-import { FlowAdvices } from './flow-advices'
-import { OrderModel } from './order-model'
-
-class View {
-  @beforeMethod(PersistanceAdvices.read, OrderModel)
-  @beforeMethod(FlowAdvices.validate)
-  update (data?) { ... }
-}
-
-
-// persistance-advices.ts
-import { AdvicePool, adviceMetadata, adviceParam, IMetadata } from 'kaop-ts'
-import { Service } from './somewhere'
-import { ICommonModel } from './somewhere'
-
-export class PersistanceAdvices extends AdvicePool {
-  static read (@adviceMetadata meta: IMetadata, @adviceParam(0) model: ICommonModel) {
-    Service.get(model.url)
-    .then(data => meta.args.push(data))
-    .then(this.next)
-  }
-}
-```
-
-Be careful, since decorated methods with **async Advices** return `undefined`
-
-### ES7 Async/Await Support
-
-Since Async/Await methods return a promise you can access that promise with `afterMethod` join point to perform several tasks such as error handling. Thanks to @jcjolley
-
-https://github.com/k1r0s/kaop-ts/issues/34
-
-### Tips
-
-> Join points decorators can be stacked and used sync or asynchronously.
-
-> Advices share target context, arguments, result, or any property you bind to `this`. But keep in mind that it will only survive during the call stack, then the only thing preserved is the target instance.
-
-> You can prevent main method execution by calling `this.stop`.
-
-> Some contexts or metadata may be accessible in several cases. For example: trying to modify method arguments at `after` join point doesn't have any sense. *Maybe for communication purposes between advices*.
-
-> You should not perform async calls during `beforeInstance` join points because you will mess up instantiation of that class.
-
-> Async advices return 'undefined'
-
-### Troubleshooting
-
-##### Babel
-
-At first we did not support Babel because they drop support for decorators (year ago, by the time of writing)... nowadays they're going to fully implement this proposal, but still we're waiting...
-
-Of course we're going to provide support for Babel users, but think that kaop-ts is intended to work with TypeScript. If Babel team implements decorators proposal as it fit it will be good for us also. Please refer here: https://github.com/babel/proposals/issues/13
-
-You should have this `.babelrc` setup:
-
-```
-{
-    "presets": [
-      "latest",
-      "react",
-      "stage-2"
-    ],
-    "plugins": ["transform-decorators-legacy"]
-}
-```
-
-This library uses parameter Decorators proposal which is a WIP on babel. We made several modifications to make param decorators optional when typing advices.
-
-So you have to avoid use of `adviceParam` and `adviceMetadada`. If you don't use param decorators advices will always have the following arguments:
-
-```javascript
-function myAdvice(metadata, param0, param1 [, paramx...]){}
-```
-
-[Motivation](https://github.com/k1r0s/kaop-ts/issues/9)
-
-##### `IMetadata was not found in 'kaop-ts'`
-
-This is due to an issue laying on TypeScript + Webpack + Angular.
-
-Check out the [reasons and workaround](https://github.com/k1r0s/kaop-ts/issues/5#issuecomment-305759257)
-
-#####  Do not reassign methods or use decorators on arrow functions (i.e.: public something = () => {})
-
-kaop-ts uses metadata properties inside methods or classes. If you alter that references by reasignment you'll mess Advice call stack.
-
-#####  Avoid async Advices with some frameworks functions (i.e.: React `render` function)
-
-Careful when adding async Advices to some frameworks functions, let's say `render` method of React component. In this case, the method will be evaluated as `undefined` messing up React rendering.
 
 ### Resources
 
-- [Working example about AOP with Angular 2+](https://github.com/k1r0s/angular2-aop-showcase)
 - [Article about Angular2+, Decorators and SRP](https://hackernoon.com/angular-tutorial-separation-of-concerns-using-es7-decorators-ed6c9756265)
 - [Aspect Oriented Programming in Javascript (ES5+\Typescript)](https://hackernoon.com/aspect-oriented-programming-in-javascript-es5-typescript-d751dda576d0)
 - [How To Handle Exceptions With Aspect Programming And Blame Covfefe](https://hackernoon.com/today-im-gonna-show-you-a-brief-yet-useful-example-about-aspect-oriented-programming-b79b2cede864)
