@@ -10,16 +10,22 @@
 [![downloads](https://img.shields.io/npm/dm/kaop-ts.svg)](https://www.npmjs.com/package/kaop-ts)
 [![Known Vulnerabilities](https://snyk.io/test/npm/kaop-ts/badge.svg)](https://snyk.io/test/npm/kaop-ts)
 
-Lightweight, modular, framework agnostic and **easy to use** AOP library written in TypeScript that takes advantage of ES2016 Decorators. Aspect Oriented Programming is a tool to change, extend, modify the behavior of methods and constructors non-invasively. If you have any doupt about this tecnique check the [resources](#resources).
+Lightweight, solid, framework agnostic and **easy to use** library written in TypeScript to deal with *Cross Cutting Concerns* and improve modularity in your code.
+
+### Short Description (or what is an Advice)
+
+This library provides a straightforward manner to implement **Advices** in your app. Advices are pieces of code that can be plugged in several places within OOP paradigm like 'beforeMethod', 'afterInstance'.. etc. Advices are used to change, extend, modify the behavior of methods and constructors non-invasively.
+
+For in deep information about this technique check the [resources](#resources).
 
 ### Get started
 
 ```bash
-npm install kaop-ts
+npm install kaop-ts --save
 ```
-Use a [join point](#available-join-points) to plug it to any method/class:
+Use a [join point](/docs/api.md#available-join-points) to plug it to any method/class:
 
-```typescript
+```javascript
 import { afterMethod } from 'kaop-ts'
 
 class DummyExample {
