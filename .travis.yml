@@ -12,7 +12,7 @@ cache:
 notifications:
   email: false
 node_js:
-  - '7.5'
+  - 8
 before_script:
   - npm prune && npm cache clean
   - npm install
