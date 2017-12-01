@@ -17,36 +17,30 @@ export const Log = afterMethod(function(meta){
 
 ### Http decorator
 
-[npm package and usage](https://www.npmjs.com/package/dec-http)
+[npm package and usage](https://www.npmjs.com/package/http-decorator)
 
 Code:
 
 ```javascript
-import axios from 'axios';
-import { beforeMethod, IAdviceSignature } from 'kaop-ts';
+const axios = require('axios');
+const { beforeMethod } = require('kaop-ts');
 
-export interface HttpGlobals {
-  base: string
-}
-
-export const config: HttpGlobals = { base: '' };
-
-export const http = (method = 'get', headers?) =>
-beforeMethod(function(meta){
-  const [ url, params ] = meta.args;
-  const opts = { method, headers }
-  opts[method === 'get' ? 'params' : 'data'] = params;
-  opts['url'] = config.base ? `${config.base}/${url}`: url;
-  axios(opts)
-  .then(({ data }) => {
-    meta.args = [ url, params, null, data ];
-    this.next();
+module.exports = {
+  http: ({ method = 'get', ...options }) =>
+  beforeMethod(function(meta){
+    const [params] = meta.args;
+    options[method === 'get' ? 'params' : 'data'] = params;
+    axios({ method, ...options })
+    .then(res => {
+      meta.args = [params, null, res.data];
+      this.next();
+    })
+    .catch(error => {
+      meta.args = [params, error, null];
+      this.next();
+    })
   })
-  .catch((error) => {
-    meta.args = [ url, params, error, null];
-    this.next();
-  })
-});
+};
 ```
 
 ### Preact scoped-stylesheet decorator
