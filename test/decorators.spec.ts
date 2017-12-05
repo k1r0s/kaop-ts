@@ -1,6 +1,7 @@
 import { adviceMetadata, adviceParam } from "../src/decorators"
 import { MetadataKey } from "../src/core/MetadataKeys"
-import { getMetadata, defineMetadata } from "core-js/library/es6/reflect"
+import store from "../src/core/store";
+
 describe(`
 adviceMetadata decorator should be used to represent the position where metadata
 must be injected as a param within an advice
@@ -10,7 +11,7 @@ must be injected as a param within an advice
     const fakeClass: any = function() {}
     fakeClass.fakeMethod = function() {}
     adviceMetadata(fakeClass, "fakeMethod", 0)
-    const metaIndex = getMetadata(MetadataKey.METADATA_PARAM, fakeClass["fakeMethod"])
+    const metaIndex = store.getMetadata(fakeClass["fakeMethod"], MetadataKey.METADATA_PARAM)
     expect(metaIndex).toBe(0)
   })
 })
@@ -33,7 +34,7 @@ be placed
     let fn3 = adviceParam(2)
     fn3(fakeClass, "fakeMethod", 3)
 
-    const adviceParamsArr = getMetadata(MetadataKey.ADVICE_PARAMS, fakeClass["fakeMethod"])
+    const adviceParamsArr = store.getMetadata(fakeClass["fakeMethod"], MetadataKey.ADVICE_PARAMS)
 
     expect(adviceParamsArr).toBeInstanceOf(Array)
     expect(adviceParamsArr.reduce((a, b) => a + b)).toBe(3)
@@ -48,7 +49,7 @@ be placed
     let fn3 = adviceParam(4)
     fn3(fakeClass, "fakeMethod", 3)
 
-    const adviceParamsArr = getMetadata(MetadataKey.ADVICE_PARAMS, fakeClass["fakeMethod"])
+    const adviceParamsArr = store.getMetadata(fakeClass["fakeMethod"], MetadataKey.ADVICE_PARAMS)
 
     expect(adviceParamsArr).toBeInstanceOf(Array)
     expect(adviceParamsArr.reduce((a, b) => a + b)).toBe(9)

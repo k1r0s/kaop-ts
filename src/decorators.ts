@@ -5,7 +5,7 @@ import { IAdviceSignature } from "./interface/IAdviceSignature"
 import { IStackEntry } from "./interface/IStackEntry"
 import { IMetadata } from "./interface/IMetadata"
 import { MetadataKey } from "./core/MetadataKeys"
-import { getMetadata, defineMetadata } from "core-js/library/es7/reflect";
+import store from "./core/store";
 
 
 /**
@@ -17,7 +17,7 @@ import { getMetadata, defineMetadata } from "core-js/library/es7/reflect";
  * @param  {number} parameterIndex  ..
  */
 export function adviceMetadata (target: any, propertyKey: string | symbol, parameterIndex: number) {
-  defineMetadata(MetadataKey.METADATA_PARAM, parameterIndex, target[propertyKey])
+  store.defineMetadata(target[propertyKey], MetadataKey.METADATA_PARAM, parameterIndex)
 }
 
 /**
@@ -28,9 +28,9 @@ export function adviceMetadata (target: any, propertyKey: string | symbol, param
  */
 export function adviceParam (index: number) {
   return function (target: any, propertyKey: string, parameterIndex: number) {
-    const parameters = getMetadata(MetadataKey.ADVICE_PARAMS, target[propertyKey]) as any[] || []
+    const parameters = store.getMetadata(target[propertyKey], MetadataKey.ADVICE_PARAMS) as any[] || []
     parameters[parameterIndex] = index
-    defineMetadata(MetadataKey.ADVICE_PARAMS, parameters, target[propertyKey])
+    store.defineMetadata(target[propertyKey], MetadataKey.ADVICE_PARAMS, parameters)
   }
 }
 
@@ -44,15 +44,15 @@ export function adviceParam (index: number) {
  */
  export function afterInstance<B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IClassAdviceSignature<B> {
   return function (target: any) {
-    let afters = getMetadata(MetadataKey.AFTER_ADVICES, target) as IStackEntry[]
+    let afters = store.getMetadata(target, MetadataKey.AFTER_ADVICES) as IStackEntry[]
     if (!afters) {
       target = bootstrap(target, "constructor", target)
       buildReflectionProperties(target);
     }
     const stackEntry: IStackEntry = { adviceFn, args }
-    afters = getMetadata(MetadataKey.AFTER_ADVICES, target) as IStackEntry[]
+    afters = store.getMetadata(target, MetadataKey.AFTER_ADVICES) as IStackEntry[]
     afters.unshift(stackEntry)
-    defineMetadata(MetadataKey.AFTER_ADVICES, afters, target)
+    store.defineMetadata(target, MetadataKey.AFTER_ADVICES, afters)
     return target
   }
 }
@@ -67,15 +67,15 @@ export function adviceParam (index: number) {
  */
 export function afterMethod<B = any, K extends keyof B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IAdviceSignature<B, K> {
   return function (target: any, propertyKey: string, descriptor) {
-    let afters = getMetadata(MetadataKey.AFTER_ADVICES, descriptor.value) as IStackEntry[]
+    let afters = store.getMetadata(descriptor.value, MetadataKey.AFTER_ADVICES) as IStackEntry[]
     if (!afters) {
       descriptor.value = bootstrap(target, propertyKey, descriptor.value)
       buildReflectionProperties(descriptor.value)
     }
     const stackEntry: IStackEntry = { adviceFn, args }
-    afters = getMetadata(MetadataKey.AFTER_ADVICES, descriptor.value) as IStackEntry[]
+    afters = store.getMetadata(descriptor.value, MetadataKey.AFTER_ADVICES) as IStackEntry[]
     afters.unshift(stackEntry)
-    defineMetadata(MetadataKey.AFTER_ADVICES, afters, descriptor.value)
+    store.defineMetadata(descriptor.value, MetadataKey.AFTER_ADVICES, afters)
     return descriptor
   }
 }
@@ -90,15 +90,15 @@ export function afterMethod<B = any, K extends keyof B = any> (adviceFn: (this: 
  */
 export function beforeInstance<B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IClassAdviceSignature<B> {
   return function (target: any) {
-    let befores = getMetadata(MetadataKey.BEFORE_ADVICES, target) as IStackEntry[]
+    let befores = store.getMetadata(target, MetadataKey.BEFORE_ADVICES) as IStackEntry[]
     if (!befores) {
       target = bootstrap(target, "constructor", target)
       buildReflectionProperties(target)
     }
     const stackEntry: IStackEntry = { adviceFn, args }
-    befores = getMetadata(MetadataKey.BEFORE_ADVICES, target) as IStackEntry[]
+    befores = store.getMetadata(target, MetadataKey.BEFORE_ADVICES) as IStackEntry[]
     befores.unshift(stackEntry)
-    defineMetadata(MetadataKey.BEFORE_ADVICES, befores, target)
+    store.defineMetadata(target, MetadataKey.BEFORE_ADVICES, befores)
     return target
   }
 }
@@ -113,15 +113,15 @@ export function beforeInstance<B = any> (adviceFn: (this: IAdviceContext, meta: 
  */
 export function beforeMethod<B = any, K extends keyof B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IAdviceSignature<B, K> {
   return function (target: any, propertyKey: string, descriptor) {
-    let befores = getMetadata(MetadataKey.BEFORE_ADVICES, descriptor.value) as IStackEntry[]
+    let befores = store.getMetadata(descriptor.value, MetadataKey.BEFORE_ADVICES) as IStackEntry[]
     if (!befores) {
       descriptor.value = bootstrap(target, propertyKey, descriptor.value)
       buildReflectionProperties(descriptor.value)
     }
     const stackEntry: IStackEntry = { adviceFn, args }
-    befores = getMetadata(MetadataKey.BEFORE_ADVICES, descriptor.value) as IStackEntry[]
+    befores = store.getMetadata(descriptor.value, MetadataKey.BEFORE_ADVICES) as IStackEntry[]
     befores.unshift(stackEntry)
-    defineMetadata(MetadataKey.BEFORE_ADVICES, befores, descriptor.value)
+    store.defineMetadata(descriptor.value, MetadataKey.BEFORE_ADVICES, befores)
     return descriptor
   }
 }
@@ -137,7 +137,7 @@ export function beforeMethod<B = any, K extends keyof B = any> (adviceFn: (this:
  */
 export function onException<B = any, K extends keyof B = any> (adviceFn: (this: IAdviceContext, meta: IMetadata<B>, ...args) => void, ...args: any[]): IAdviceSignature<B, K> {
   return function (target: any, propertyKey: string, descriptor) {
-    let error = getMetadata(MetadataKey.ERROR_PLACEHOLDER, descriptor.value) as IStackEntry
+    let error = store.getMetadata(MetadataKey.ERROR_PLACEHOLDER, descriptor.value) as IStackEntry
     // If descriptor hasn't been initializated (by default has to be initializated to 'null')
     if (error !== null) {
       // descriptor is initializated, method is wrapped
@@ -146,7 +146,7 @@ export function onException<B = any, K extends keyof B = any> (adviceFn: (this: 
     }
     const stackEntry: IStackEntry = { adviceFn, args }
     // Place it on $$error placeholder which will be checked later
-    defineMetadata(MetadataKey.ERROR_PLACEHOLDER, stackEntry, descriptor.value)
+    store.defineMetadata(descriptor.value, MetadataKey.ERROR_PLACEHOLDER, stackEntry)
     return descriptor
   }
 }

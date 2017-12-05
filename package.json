@@ -90,9 +90,5 @@
     "typedoc": "^0.9.0",
     "typescript": "^2.3.3",
     "validate-commit-msg": "^2.10.1"
-  },
-  "dependencies": {
-    "@types/core-js": "^0.9.42",
-    "core-js": "^2.5.0"
   }
 }

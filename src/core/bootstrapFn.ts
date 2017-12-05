@@ -1,7 +1,7 @@
 import { CallStackIterator } from "./CallStackIterator"
 import { IMetadata } from "../interface/IMetadata"
 import { MetadataKey } from "./MetadataKeys"
-import { getMetadata, defineMetadata } from "core-js/library/es7/reflect"
+import store from "./store";
 
 /**
  * @function bootstrap - this function replaces|wraps the given method (that was decorated)
@@ -29,15 +29,15 @@ export function bootstrap (target: any, propertyKey: string, rawMethod: (...args
 
     // concat before and after stacks
     let stack = [].concat(
-      getMetadata(MetadataKey.BEFORE_ADVICES, fnref),
+      store.getMetadata(fnref, MetadataKey.BEFORE_ADVICES),
       [null],
-      getMetadata(MetadataKey.AFTER_ADVICES, fnref)
+      store.getMetadata(fnref, MetadataKey.AFTER_ADVICES)
     )
 
     // creates an instance which recursively will drive over advices or methods
     // calling this.next (CallStackIterator method)
     /* tslint:disable-next-line */
-    new CallStackIterator(metadata, stack, getMetadata(MetadataKey.ERROR_PLACEHOLDER, fnref))
+    new CallStackIterator(metadata, stack, store.getMetadata(fnref, MetadataKey.ERROR_PLACEHOLDER))
     return metadata.result
   }
 
@@ -48,7 +48,7 @@ export function bootstrap (target: any, propertyKey: string, rawMethod: (...args
 }
 
 export function buildReflectionProperties (subject: any) {
-  defineMetadata(MetadataKey.BEFORE_ADVICES, [], subject)
-  defineMetadata(MetadataKey.AFTER_ADVICES, [], subject)
-  defineMetadata(MetadataKey.ERROR_PLACEHOLDER, null, subject)
+  store.defineMetadata(subject, MetadataKey.BEFORE_ADVICES, [])
+  store.defineMetadata(subject, MetadataKey.AFTER_ADVICES, [])
+  store.defineMetadata(subject, MetadataKey.ERROR_PLACEHOLDER, null)
 }
