@@ -1,7 +1,7 @@
 import { IStackEntry } from "../interface/IStackEntry"
 import { IMetadata } from "../interface/IMetadata"
 import { MetadataKey } from "./MetadataKeys"
-import { getMetadata, defineMetadata } from "core-js/library/es7/reflect"
+import store from "./store"
 
 /**
  * {class} CallStackIterator
@@ -120,8 +120,8 @@ export class CallStackIterator {
   private transformArguments (stackEntry: IStackEntry): any[] {
 
     const transformedArguments = []
-    const reflectAdviceParams: number[] = getMetadata(MetadataKey.ADVICE_PARAMS, stackEntry.adviceFn)
-    const reflectMetaParam: number = getMetadata(MetadataKey.METADATA_PARAM, stackEntry.adviceFn)
+    const reflectAdviceParams: number[] = store.getMetadata(stackEntry.adviceFn, MetadataKey.ADVICE_PARAMS)
+    const reflectMetaParam: number = store.getMetadata(stackEntry.adviceFn, MetadataKey.METADATA_PARAM)
 
     // if stackEntry.advice.$$params evals is an Array means that the user
     // implemented @adviceParams

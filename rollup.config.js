@@ -10,11 +10,7 @@ export default {
   ],
   sourcemap: true,
   plugins: [
-    commonjs({
-      namedExports: {
-        './node_modules/core-js/library/es7/reflect.js': ['getMetadata', 'defineMetadata']
-      }
-    }),
+    commonjs(),
     resolve()
   ]
 }
