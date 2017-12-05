@@ -1,8 +1,7 @@
 import { IStackEntry } from "../interface/IStackEntry"
 import { IMetadata } from "../interface/IMetadata"
 import { MetadataKey } from "./MetadataKeys"
-import store from "./store";
-
+import store from "./store"
 
 /**
  * {class} CallStackIterator

@@ -1,7 +1,7 @@
 import { CallStackIterator } from "./CallStackIterator"
 import { IMetadata } from "../interface/IMetadata"
 import { MetadataKey } from "./MetadataKeys"
-import store from "./store";
+import store from "./store"
 
 /**
  * @function bootstrap - this function replaces|wraps the given method (that was decorated)
