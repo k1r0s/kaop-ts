@@ -90,5 +90,8 @@
     "typedoc": "^0.9.0",
     "typescript": "^2.3.3",
     "validate-commit-msg": "^2.10.1"
+  },
+  "dependencies": {
+    "kaop": "^3.0.1"
   }
 }
