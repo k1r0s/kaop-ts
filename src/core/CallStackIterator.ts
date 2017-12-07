@@ -164,6 +164,6 @@ export class CallStackIterator {
         .replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, "")
         // Remove comments
         .replace(/(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/g, "")
-        .match(/.next/);
+        .match(/.next/)
   }
 }
