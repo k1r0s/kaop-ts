@@ -1,4 +1,4 @@
-import { beforeMethod, afterMethod, beforeInstance } from ".."
+import { beforeMethod, afterMethod, beforeInstance } from "../src"
 import { inject, override, provider } from "kaop"
 
 class SomeService {

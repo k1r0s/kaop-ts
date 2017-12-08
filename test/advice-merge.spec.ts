@@ -1,4 +1,4 @@
-import { beforeMethod } from ".."
+import { beforeMethod } from "../src"
 
 const Delay = secs => meta => setTimeout(meta.commit, secs)
 

@@ -6,6 +6,7 @@ export interface Metadata<B> {
   exception: undefined,
   target: Object,
   result: undefined,
+  handle: Function,
   commit: Function,
   break: Function,
   // skip: Function

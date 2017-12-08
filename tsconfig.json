@@ -27,7 +27,7 @@
         "**/*.ts"
     ],
     "include": [
-        "src"
+      "src"
     ],
     "compileOnSave": true,
     "buildOnSave": false,
