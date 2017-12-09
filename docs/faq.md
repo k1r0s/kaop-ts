@@ -1,10 +1,4 @@
-### Discourage about arrow functions in advice declaration
-
-Briefly advices have its own context meaning that you should not define an Advice using an arrow function just because you need `this` to be pointing to the advice context. If you need to access to the decorated instance you should use `Metadata.scope` property.
-
-Check this issue for more in deep information: https://github.com/k1r0s/kaop-ts/issues/18
-
-### Babel param decorators
+### Babel
 
 At first we did not support Babel because they drop support for decorators (year ago, by the time of writing)... nowadays they're going to fully implement this proposal, but still we're waiting...
 
@@ -21,17 +15,6 @@ You should have at least this `.babelrc` setup:
     "plugins": ["transform-decorators-legacy"]
 }
 ```
-
-This library uses parameter Decorators proposal which is a WIP on babel. We made several modifications to make param decorators optional when typing advices.
-
-So you have to avoid use of `adviceParam` and `adviceMetadada`. If you don't use param decorators advices will always have the following arguments:
-
-```javascript
-function myAdvice(metadata, param0, param1 [, paramx...]){}
-```
-
-At any case you can still wrap your join point definition with another function to receive params which is a straight forward solution. Check receiving params [By Closure ref](/docs/api.md#by-closure-reference)
-
 [Motivation](https://github.com/k1r0s/kaop-ts/issues/9)
 
 ### `IMetadata was not found in 'kaop-ts'`
@@ -54,7 +37,7 @@ Careful when adding async Advices to some frameworks functions, let's say `rende
 
 > Advices share target context, arguments, result, or any property you bind to `this`. But keep in mind that it will only survive during the call stack, then the only thing preserved is the target instance.
 
-> You can prevent main method execution by calling `this.stop`.
+> You can prevent main method execution by calling `meta.prevent`.
 
 > Some contexts or metadata may be accessible in several cases. For example: trying to modify method arguments at `after` join point doesn't have any sense. *Maybe for communication purposes between advices*.
 
