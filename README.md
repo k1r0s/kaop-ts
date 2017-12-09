@@ -40,7 +40,7 @@ DummyExample.calculateSomething(3, 3) // 18
 DummyExample.calculateSomething(5, 5) // 50
 ```
 
-### Whats new on 2.0
+### Whats new on 3.0
 
 - Advices no longer use `this` to access several utilities.
 - Metadata properties have been renamed. Here you can check [the reference ](https://github.com/k1r0s/kaop-ts/blob/master/docs/api.md#metadata).
