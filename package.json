@@ -61,10 +61,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 80,
+        "branches": 60,
         "functions": 85,
-        "lines": 90,
-        "statements": 90
+        "lines": 85,
+        "statements": 85
       }
     }
   },
@@ -90,5 +90,8 @@
     "typedoc": "^0.9.0",
     "typescript": "^2.3.3",
     "validate-commit-msg": "^2.10.1"
+  },
+  "dependencies": {
+    "kaop": "^3.1.0"
   }
 }

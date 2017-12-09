@@ -19,7 +19,7 @@
           "node_modules/@types"
         ],
         "lib": [
-          "es2016",
+          "ES6",
           "dom"
         ]
     },
@@ -27,8 +27,7 @@
         "**/*.ts"
     ],
     "include": [
-        "src",
-        "test"
+      "src"
     ],
     "compileOnSave": true,
     "buildOnSave": false,

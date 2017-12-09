@@ -1,14 +1,14 @@
 #### How do I define an Advice?
 
-###### As an anonymous function ([warning about lambda!](https://github.com/k1r0s/kaop-ts/issues/18)):
+###### As an anonymous function:
 ```typescript
-@beforeInstance(function() {
+@beforeInstance(meta => {
   // stuff
 })
 ```
 ###### As an alias:
 ```typescript
-const myCustomAdvice = beforeInstance(function() {
+const myCustomAdvice = beforeInstance(meta => {
   // stuff
 })
 
@@ -16,11 +16,9 @@ const myCustomAdvice = beforeInstance(function() {
 ```
 ###### As an expression:
 ```typescript
-const myCustomAdvice = function(...args) {
-  return beforeInstance(function() {
-    // stuff
-  })
-}
+const myCustomAdvice = (...args) => beforeInstance(meta => {
+  // stuff
+})
 
 @myCustomAdvice(arg0, arg1)
 ```
@@ -32,40 +30,28 @@ const myCustomAdvice = beforeMethod<MyComponent, 'ngOnInit'>(function() {
 
 @myCustomAdvice // can only be used at MyComponent::ngOnInit
 ```
-###### (Old fashioned) As a static property of class that extends `AdvicePool`:
-```typescript
-class MyAdvices extends AdvicePool {
-  static myCustomAdvice(meta) {
-    // stuff
-  }
-}
-
-@beforeMethod(MyAdvices.myCustomAdvice)
-```
 
 #### Metadata
 
 ```typescript
 @beforeInstance(function(meta) {
   meta.args // Arguments to be received by decorated method
-  meta.propertyKey // Name of the decorated method as string
+  meta.key // Name of the decorated method as string
   meta.scope // Instance or the context of the call stack
-  meta.rawMethod // Original method
+  meta.method // Original method
   meta.target // Class definition
   meta.result // The returned value by the method
-})
-```
+  meta.exception // current exception (if any). The exception should be handled
+  // using `meta.handle()` to avoid error to be thrown.
 
-#### Advice context `this`
-
-```typescript
-@beforeInstance(function() {
-  this.next()
-  // triggers the next advice or method in the
+  meta.commit() // triggers the next advice or method in the
   // call stack (mandatory if your advice contains async operations)
-  this.stop() // prevent execution of decorated method (GUESS WHY)
-  this.break() // prevent execution of following advices until method execution
-  this.stopped // boolean, will evaluate to true if stop() was called
+
+  meta.break() // prevent execution of following advices until method execution
+
+  meta.handle() // returns the exception (if any) and prevents to be thrown.
+
+  meta.prevent() // prevents the main method to be executed (GUESS WHY).
 })
 ```
 
@@ -74,12 +60,12 @@ class MyAdvices extends AdvicePool {
 Join points allow you to plug Advices into parts of your code.
 
 ```typescript
-@afterMethod // method accepts <B = any, K extends keyof B = any>
-@beforeMethod // method accepts <B = any, K extends keyof B = any>
-@onException // method accepts <B = any, K extends keyof B = any>
+@afterMethod // `method`. Accepts <B = any, K extends keyof B = any>
+@beforeMethod // `method`. Accepts <B = any, K extends keyof B = any>
+@onException // `method`. Built on top afterMethod. Accepts <B = any>
 
-@afterInstance // class accepts <B = any>
-@beforeInstance // class accepts <B = any>
+@afterInstance // `class`. Accepts <B = any>
+@beforeInstance // `class`. Accepts <B = any>
 ```
 
 Join points provide two generic placeholder to enhace strong typings. Check out [angular 2 example:](https://github.com/k1r0s/angular2-aop-showcase/blob/master/src/app/behaviors/resource-container.ts)
@@ -97,40 +83,18 @@ An Advice have access to the original method/instance by [accessing its metadata
 ##### By closure reference
 ```typescript
 
-const log = (path, num) => {
-  return afterMethod(function(meta) {
-    path // "log/file/path"
-    num // 31
-  })
-}
+const log = (path, num) => afterMethod(meta => {
+  path // "log/file/path"
+  num // 31
+})
 
 class Person {
   // passed through join point
-  @log('log/file/path', 31, {what: 'ever'})
+  @log('log/file/path', 31)
   getAge() { ... }
 }
 ```
 
-##### Through join point
-```typescript
-
-import { AdvicePool, adviceMetadata } from 'kaop-ts'
-
-// retrieved using `@adviceParam` decorator in the Advice
-export class Registry extends AdvicePool {
-  static log (@adviceParam(0) path, @adviceParam(1) num) {
-    path // "log/file/path"
-    num // 31
-    ...
-  }
-}
-
-class Person {
-  // passed through join point
-  @afterMethod(Registry.log, 'log/file/path', 31, {what: 'ever'})
-  getAge() { ... }
-}
-```
 ## Call Stack
 
 You can place many join points, they'll be executed sequentially, from top to bottom.
@@ -153,46 +117,34 @@ _Note:_ you might find an `IMetadata was not found in 'kaop-ts'` issue. See [Tro
 
 #### Async advices
 
-By default, advices are synchronous, unless you use `this.next()` in your code. Then it is asynchronous and the flow will not continue until `this.next()` is called.
+By default, advices are synchronous, unless you use `meta.commit()` in your code. Then it is asynchronous and the flow will not continue until `meta.commit()` is called.
 
 ```typescript
-import { AdvicePool } from 'kaop-ts'
 
-export class PersistanceAdvices extends AdvicePool {
-  static save () {
-    ...
-    this.next() // It must be called and reachable, otherwise the flow hangs
-  }
+const fetch = meta => {
+  ...
+  meta.commit() // It must be called and reachable, otherwise the flow hangs
 }
+
+const transform = meta => {
+  ...
+  const [ result, ...args ] = meta.args
+  // applying some transformation to first argument received by the decorated method
+  meta.args = [transformParams(result), ...args ]
+}
+
+
 ```
 
-The following example uses 2 Advices: the first one is asynchronous, while the second not. The second one needs to be called right after `read` has finished:
+The following example uses 2 Advices: the first one is asynchronous, while the second not. The second one needs to be called right after `fetch` has finished:
 
 ```typescript
 // view.ts
 import { beforeMethod } from 'kaop-ts'
-import { PersistanceAdvices } from './persistance-advices'
-import { FlowAdvices } from './flow-advices'
-import { OrderModel } from './order-model'
 
 class View {
-  @beforeMethod(PersistanceAdvices.read, OrderModel)
-  @beforeMethod(FlowAdvices.validate)
-  update (data?) { ... }
-}
-
-
-// persistance-advices.ts
-import { AdvicePool, adviceMetadata, adviceParam, IMetadata } from 'kaop-ts'
-import { Service } from './somewhere'
-import { ICommonModel } from './somewhere'
-
-export class PersistanceAdvices extends AdvicePool {
-  static read (@adviceMetadata meta: IMetadata, @adviceParam(0) model: ICommonModel) {
-    Service.get(model.url)
-    .then(data => meta.args.push(data))
-    .then(this.next)
-  }
+  @beforeMethod(fetch, transform)
+  setPermission () { ... }
 }
 ```
 
