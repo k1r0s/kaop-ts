@@ -92,6 +92,6 @@
     "validate-commit-msg": "^2.10.1"
   },
   "dependencies": {
-    "kaop": "^3.1.0"
+    "kaop": "^4.0.0"
   }
 }

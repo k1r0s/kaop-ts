@@ -47,7 +47,7 @@ const myCustomAdvice = beforeMethod<MyComponent, 'ngOnInit'>(function() {
   meta.commit() // triggers the next advice or method in the
   // call stack (mandatory if your advice contains async operations)
 
-  meta.break() // prevent execution of following advices until method execution
+  meta.skip() // prevent execution of following advices until method execution
 
   meta.handle() // returns the exception (if any) and prevents to be thrown.
 

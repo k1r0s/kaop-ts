@@ -12,7 +12,7 @@ const Cache = (_ => {
 
       if (meta.scope[CACHE_KEY][meta.key]) {
         meta.result = meta.scope[CACHE_KEY][meta.key]
-        meta.break()
+        meta.prevent()
       }
     },
     write: meta => {

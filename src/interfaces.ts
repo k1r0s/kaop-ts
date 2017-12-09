@@ -4,12 +4,13 @@ export interface Metadata<B> {
   key: string,
   method: Function,
   exception: undefined,
-  target: Object,
   result: undefined,
+  prevented: undefined,
+  target: Object,
   handle: Function,
   commit: Function,
-  break: Function,
-  // skip: Function
+  prevent: Function,
+  skip: Function
 }
 
 export interface AdviceRef<B> {
