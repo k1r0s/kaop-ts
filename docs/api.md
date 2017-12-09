@@ -50,6 +50,8 @@ const myCustomAdvice = beforeMethod<MyComponent, 'ngOnInit'>(function() {
   meta.break() // prevent execution of following advices until method execution
 
   meta.handle() // returns the exception (if any) and prevents to be thrown.
+
+  meta.prevent() // prevents the main method to be executed (GUESS WHY).
 })
 ```
 
