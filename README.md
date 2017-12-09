@@ -40,6 +40,23 @@ DummyExample.calculateSomething(3, 3) // 18
 DummyExample.calculateSomething(5, 5) // 50
 ```
 
+### Whats new on 2.0
+
+- Advices no longer use `this` to access several utilities.
+- Metadata properties have been renamed. Here you can check [the reference ](https://github.com/k1r0s/kaop-ts/blob/master/docs/api.md#metadata).
+- JoinPoints support multiple advices:
+
+```javascript
+// join point decorators expect a list of advices
+@beforeMethod(advice1, advice2, advice3)
+// even you can provide an advice array using spread operator
+@beforeMethod(...adviceList)
+someMethod() {
+
+}
+
+```
+
 ### Docs
 
 - [Docs](/docs/api.md)
@@ -47,13 +64,11 @@ DummyExample.calculateSomething(5, 5) // 50
     - [As an anonymous function](/docs/api.md#as-an-anonymous-function-warning-about-lambda)
     - [As an alias](/docs/api.md#as-an-alias)
     - [Using TypeScript generics](/docs/api.md#using-typescript-generics)
-    - [As a static property of class](/docs/api.md#old-fashioned-as-a-static-property-of-class-that-extends-advicepool)
   - [Metadata Object](/docs/api.md#metadata)
   - [Join Points](/docs/api.md#available-join-points)
   - [Comunication between Advices](/docs/api.md#comunication-between-advices-or-decorated-method-metadata)
   - [Parametrized Advices](/docs/api.md#receiving-params)
     - [By Closure ref](/docs/api.md#by-closure-reference)
-    - [Through Join Point](/docs/api.md#through-join-point)
   - [Call-stack](/docs/api.md#call-stack)
     - [Async Advices](/docs/api.md#async-advices)
 - [Troubleshooting](/docs/faq.md)
@@ -65,6 +80,7 @@ DummyExample.calculateSomething(5, 5) // 50
   - @jcjolley [ES7 Async/Await Support](/docs/community.md#es7-asyncawait-support)
   - @alexjoverm [onException Join Point](https://github.com/k1r0s/kaop-ts/pull/4)
 - [Some Examples](/docs/examples.md)
+  (older version, API may defer)
   - [Working example about AOP/SRP with Angular 2+](https://github.com/k1r0s/angular2-srp-showcase)
   - [Log decorator implementation](/docs/examples.md#log-decorator)
   - [Http decorator using axios](/docs/examples.md#http-decorator)
