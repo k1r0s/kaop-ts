@@ -42,6 +42,10 @@ describe("inject specs", () => {
     model = new DummyModel()
   })
 
+  it("Instance decorators do not broke protoChain", () => {
+    expect(test).toBeInstanceOf(Test)
+  })
+
   it("should be able to inject dependencies", () => {
     expect(model.$ser).toBeInstanceOf(SomeService)
     expect(test.$ser).toBeInstanceOf(SomeService)
