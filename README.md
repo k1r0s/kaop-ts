@@ -30,7 +30,7 @@ import { afterMethod } from 'kaop-ts'
 
 class DummyExample {
 
-  @afterMethod(function(meta) { meta.result * 2 })
+  @afterMethod(meta => meta.result * 2)
   static calculateSomething (num, num2) {
     return num * num2
   }
