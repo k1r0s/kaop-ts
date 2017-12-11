@@ -1,4 +1,4 @@
-import resolve from "rollup-plugin-node-resolve"
+// import resolve from "rollup-plugin-node-resolve"
 import commonjs from "rollup-plugin-commonjs"
 const pkg = require("./package.json")
 
@@ -10,7 +10,7 @@ export default {
   ],
   sourcemap: true,
   plugins: [
-    commonjs(),
-    resolve()
-  ]
+    commonjs()
+  ],
+  external: ['kaop']
 }
