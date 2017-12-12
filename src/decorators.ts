@@ -1,7 +1,7 @@
 import { getMetadata, defineMetadata } from "./reflect-metadata-polyfill"
 import { KEY_ORIGINAL_METHOD, KEY_BEFORE_METHOD, KEY_AFTER_METHOD, KEY_BEFORE_INSTANCE, KEY_AFTER_INSTANCE } from "./constants"
 import { AdviceRef, Metadata, MethodSignature, ClassSignature } from "./interfaces"
-const { reflect } = require("kaop")
+import { reflect } from "kaop"
 
 function generateKey (scope, methodName) {
   return `${scope}-${methodName}`
