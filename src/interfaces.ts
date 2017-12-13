@@ -24,3 +24,12 @@ export interface MethodSignature<B, K> {
 export interface ClassSignature<B> {
   (target: B)
 }
+
+export interface AspectBuilder {
+  (definition: AspectDefinition)
+}
+
+export interface AspectDefinition {
+  decorateClass: Function,
+  decorateMethod: Function,
+}
