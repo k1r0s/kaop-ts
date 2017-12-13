@@ -27,7 +27,7 @@ function applyReflect (target, advices, methodName, keyJoinPoint, original) {
     const keyBeforeInstance = generateKey(KEY_BEFORE_INSTANCE, methodName)
     const keyAfterInstance = generateKey(KEY_AFTER_INSTANCE, methodName)
     // this is only needed to avoid babel's TypeError https://github.com/babel/babel/issues/682
-    // and should be removed in the future when babel isn't no longer needed to transpile ES6 classes
+    // and should be removed when ES6 classes will be fully supported
     const result = wrapMethod(target, methodName, keyBeforeInstance, keyAfterInstance)
     result.prototype = target.prototype
     return result

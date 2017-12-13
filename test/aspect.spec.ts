@@ -1,4 +1,4 @@
-import { applyAspect, beforeMethod, afterMethod } from "../src"
+import { applyAspect, afterInstance, beforeInstance, beforeMethod, afterMethod } from "../src"
 
 const methodSpy = jest.fn()
 
