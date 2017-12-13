@@ -1,7 +1,7 @@
-export function applyAspect(advicePool: any) {
-  return function(target) {
+export function applyAspect (advicePool: any) {
+  return function (target) {
     for (let key in advicePool) {
-      if(key === "constructor") {
+      if (key === "constructor") {
         advicePool[key].forEach(advice => target = advice(target))
       } else {
         advicePool[key].forEach(advice => {
