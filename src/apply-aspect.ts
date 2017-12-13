@@ -1,12 +1,15 @@
-export function applyAspect ({ instance = [], ...methodAdvices }: any) {
+export function applyAspect (definition: any) {
   return function (target) {
-    for (let key in methodAdvices) {
-      methodAdvices[key].forEach(advice =>
+    const ctor = definition["constructor"] instanceof Array ? definition["constructor"] : []
+    delete definition["constructor"]
+
+    for (let key in definition) {
+      definition[key].forEach(advice =>
         Object.defineProperty(target.prototype, key,
           advice(target, key, Object.getOwnPropertyDescriptor(target.prototype, key))))
     }
 
-    instance.forEach(advice => target = advice(target))
+    ctor.forEach(advice => target = advice(target))
     return target
   }
 }
