@@ -1,10 +1,10 @@
-import { beforeMethod, afterMethod, afterInstance, beforeInstance } from "../src";
+import { beforeMethod, afterMethod, afterInstance, beforeInstance } from "../src"
 
-const op1 = meta => meta.args[0]++;
-const op2 = meta => meta.args[0] * 2;
-const op3 = meta => meta.args[0] - 5;
-const op4 = meta => meta.args[0] * 10;
-const op5 = meta => meta.args[0] / 2;
+const op1 = meta => meta.args[0]++
+const op2 = meta => meta.args[0] * 2
+const op3 = meta => meta.args[0] - 5
+const op4 = meta => meta.args[0] * 10
+const op5 = meta => meta.args[0] / 2
 
 @beforeInstance(op2)
 @beforeInstance(op1)
@@ -76,23 +76,23 @@ class Dummy8 {
 
 describe("obtain several product by doing calculation to ensure advice order", () => {
   it("evaluate before instance order", () => {
-    const instance1 = new Dummy1(0);
-    const instance2 = new Dummy2(0);
-    expect(instance1.output).toEqual(instance2.output);
+    const instance1 = new Dummy1(0)
+    const instance2 = new Dummy2(0)
+    expect(instance1.output).toEqual(instance2.output)
   })
   it("evaluate after instance order", () => {
-    const instance5 = new Dummy5(0);
-    const instance6 = new Dummy6(0);
-    expect(instance5.output).toEqual(instance6.output);
+    const instance5 = new Dummy5(0)
+    const instance6 = new Dummy6(0)
+    expect(instance5.output).toEqual(instance6.output)
   })
   it("evaluate before method order", () => {
-    const res3 = Dummy3.someMethod(0);
-    const res4 = Dummy4.someMethod(0);
-    expect(res3).toEqual(res4);
+    const res3 = Dummy3.someMethod(0)
+    const res4 = Dummy4.someMethod(0)
+    expect(res3).toEqual(res4)
   })
   it("evaluate after method order", () => {
-    const res7 = Dummy7.someMethod(0);
-    const res8 = Dummy8.someMethod(0);
-    expect(res7).toEqual(res8);
+    const res7 = Dummy7.someMethod(0)
+    const res8 = Dummy8.someMethod(0)
+    expect(res7).toEqual(res8)
   })
 })
