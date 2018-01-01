@@ -81,7 +81,7 @@
     "rollup": "^0.53.0",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "semantic-release": "^8.0.0",
+    "semantic-release": "^11.0.2",
     "ts-jest": "^22.0.0",
     "ts-node": "^3.0.4",
     "tsc-watch": "^1.0.5",
