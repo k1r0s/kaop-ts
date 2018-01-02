@@ -4,7 +4,7 @@
 [![Greenkeeper badge](https://badges.greenkeeper.io/k1r0s/kaop-ts.svg)](https://greenkeeper.io/)
 [![Image travis](https://travis-ci.org/k1r0s/kaop-ts.svg?branch=master)](https://travis-ci.org/k1r0s/)
 [![version](https://img.shields.io/npm/v/kaop-ts.svg)](https://www.npmjs.com/package/kaop-ts/)
-[![Coverage Status](https://coveralls.io/repos/github/k1r0s/kaop-ts/badge.svg?branch=master)](https://coveralls.io/github/k1r0s/kaop-ts)
+[![Coverage Status](https://coveralls.io/repos/github/k1r0s/kaop-ts/badge.svg?branch=master)](https://coveralls.io/github/k1r0s/kaop-ts?branch=master)
 [![dependencies](https://david-dm.org/k1r0s/kaop-ts/status.svg)](https://david-dm.org/k1r0s/kaop-ts/status.svg)
 [![dev-dependencies](https://david-dm.org/k1r0s/kaop-ts/dev-status.svg)](https://www.npmjs.com/package/kaop-ts)
 [![downloads](https://img.shields.io/npm/dm/kaop-ts.svg)](https://www.npmjs.com/package/kaop-ts)
@@ -30,7 +30,7 @@ import { afterMethod } from 'kaop-ts'
 
 class DummyExample {
 
-  @afterMethod(function(meta) { meta.result * 2 })
+  @afterMethod(meta => meta.result * 2)
   static calculateSomething (num, num2) {
     return num * num2
   }

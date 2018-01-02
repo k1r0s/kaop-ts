@@ -1,7 +1,7 @@
 import { getMetadata, defineMetadata } from "./reflect-metadata-polyfill"
 import { KEY_ORIGINAL_METHOD, KEY_BEFORE_METHOD, KEY_AFTER_METHOD, KEY_BEFORE_INSTANCE, KEY_AFTER_INSTANCE } from "./constants"
 import { AdviceRef, Metadata, MethodSignature, ClassSignature } from "./interfaces"
-const { reflect } = require("kaop")
+import { reflect } from "kaop"
 
 function generateKey (scope, methodName) {
   return `${scope}-${methodName}`
@@ -27,7 +27,7 @@ function applyReflect (target, advices, methodName, keyJoinPoint, original) {
     const keyBeforeInstance = generateKey(KEY_BEFORE_INSTANCE, methodName)
     const keyAfterInstance = generateKey(KEY_AFTER_INSTANCE, methodName)
     // this is only needed to avoid babel's TypeError https://github.com/babel/babel/issues/682
-    // and should be removed in the future when babel isn't no longer needed to transpile ES6 classes
+    // and should be removed when ES6 classes will be fully supported
     const result = wrapMethod(target, methodName, keyBeforeInstance, keyAfterInstance)
     result.prototype = target.prototype
     return result
