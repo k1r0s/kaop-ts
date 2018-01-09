@@ -70,7 +70,7 @@
   },
   "devDependencies": {
     "@types/jest": "^22.0.0",
-    "@types/node": "^8.0.46",
+    "@types/node": "^9.3.0",
     "commitizen": "^2.9.5",
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.0",
