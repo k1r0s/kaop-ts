@@ -89,6 +89,8 @@ someMethod() {
 
 ### Resources
 
+
+- [Talk - AngularBeers (bcn) Separation of Concerns in modern JavaScript](https://github.com/k1r0s/angular-beers-dec19-separation-of-concerns)
 - [Article about Angular2+, Decorators and SRP](https://hackernoon.com/angular-tutorial-separation-of-concerns-using-es7-decorators-ed6c9756265)
 - [Aspect Oriented Programming in Javascript (ES5+\Typescript)](https://hackernoon.com/aspect-oriented-programming-in-javascript-es5-typescript-d751dda576d0)
 - [How To Handle Exceptions With Aspect Programming And Blame Covfefe](https://hackernoon.com/today-im-gonna-show-you-a-brief-yet-useful-example-about-aspect-oriented-programming-b79b2cede864)
