@@ -5,7 +5,7 @@
   "keywords": [],
   "main": "dist/kaop-ts.umd.js",
   "module": "dist/kaop-ts.es5.js",
-  "typings": "dist/types/src/kaop-ts.d.ts",
+  "typings": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
