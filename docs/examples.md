@@ -8,7 +8,7 @@ Code:
 import { afterMethod } from "kaop-ts";
 
 export const Log = afterMethod(function(meta){
-  const methodName = `${meta.target.constructor.name}::${meta.propertyKey}`;
+  const methodName = `${meta.target.constructor.name}::${meta.key}`;
   console.info(`log-decorator: ${methodName} invoked!`);
   console.info(`log-decorator: ${methodName} arguments -> `, meta.args);
   console.info(`log-decorator: ${methodName} result -> `, meta.result);
