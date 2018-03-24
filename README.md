@@ -18,6 +18,10 @@ This library provides a straightforward manner to implement **Advices** in your 
 
 For in deep information about this technique check the [resources](#resources).
 
+### Demo
+
+https://jsbin.com/bogecojuvi/edit?js,console
+
 ### Get started
 
 ```bash
@@ -30,7 +34,7 @@ import { afterMethod } from 'kaop-ts'
 
 class DummyExample {
 
-  @afterMethod(meta => meta.result * 2)
+  @afterMethod(meta => meta.result *= 2)
   static calculateSomething (num, num2) {
     return num * num2
   }
