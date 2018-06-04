@@ -69,7 +69,7 @@
     }
   },
   "devDependencies": {
-    "@types/jest": "^22.0.0",
+    "@types/jest": "^23.0.0",
     "@types/node": "^10.0.3",
     "commitizen": "^2.9.5",
     "coveralls": "^3.0.0",
