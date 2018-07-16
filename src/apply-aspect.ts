@@ -1,4 +1,4 @@
-export function applyAspect (definition: any) {
+export function applyAspect<B = any> (definition: keyof B | any) {
   return function (target) {
     const ctor = definition["constructor"] instanceof Array ? definition["constructor"] : []
     delete definition["constructor"]

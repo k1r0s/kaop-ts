@@ -88,10 +88,11 @@
     "tslint": "^5.2.0",
     "tslint-config-standard": "^7.1.0",
     "typedoc": "^0.11.0",
-    "typescript": "^2.3.3",
+    "typescript": "^2.9.2",
     "validate-commit-msg": "^2.10.1"
   },
   "dependencies": {
-    "kaop": "^4.0.0"
+    "kaop": "^4.2.1",
+    "reflect-metadata": "^0.1.12"
   }
 }

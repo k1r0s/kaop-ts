@@ -1,37 +1,35 @@
-import { getMetadata, defineMetadata } from "./reflect-metadata-polyfill"
 import { KEY_ORIGINAL_METHOD, KEY_BEFORE_METHOD, KEY_AFTER_METHOD, KEY_BEFORE_INSTANCE, KEY_AFTER_INSTANCE } from "./constants"
 import { AdviceRef, Metadata, MethodSignature, ClassSignature } from "./interfaces"
 import { reflect } from "kaop"
+import "reflect-metadata"
 
 function generateKey (scope, methodName) {
   return `${scope}-${methodName}`
 }
 
-function wrapMethod (target, methodName, beforeKey, afterKey) {
+function wrapMethod (target, methodName, beforeKey, afterKey, caller?) {
   const keyOriginalMethod = generateKey(KEY_ORIGINAL_METHOD, methodName)
   return reflect.createProxyFn(target, methodName, [
-    ...getMetadata(target, beforeKey) || [],
-    getMetadata(target, keyOriginalMethod),
-    ...getMetadata(target, afterKey) || []
-  ])
+    ...Reflect.getMetadata(beforeKey, target) || [],
+    Reflect.getMetadata(keyOriginalMethod, target),
+    ...Reflect.getMetadata(afterKey, target) || []
+  ], caller)
 }
 
 function applyReflect (target, advices, methodName, keyJoinPoint, original) {
   const keyOriginalMethod = generateKey(KEY_ORIGINAL_METHOD, methodName)
-  const adviceArr = getMetadata(target, keyJoinPoint) || []
+  const adviceArr = Reflect.getMetadata(keyJoinPoint, target) || []
   adviceArr.push(...advices.map(reflect.advice))
-  defineMetadata(target, keyJoinPoint, adviceArr)
-  if (!getMetadata(target, keyOriginalMethod)) defineMetadata(target, keyOriginalMethod, original)
+  Reflect.defineMetadata(keyJoinPoint, adviceArr, target)
+  if (!Reflect.getMetadata(keyOriginalMethod, target)) Reflect.defineMetadata(keyOriginalMethod, original, target)
 
   if (methodName === "constructor") {
     const keyBeforeInstance = generateKey(KEY_BEFORE_INSTANCE, methodName)
     const keyAfterInstance = generateKey(KEY_AFTER_INSTANCE, methodName)
-    // this is only needed to avoid babel's TypeError https://github.com/babel/babel/issues/682
-    // and should be removed when ES6 classes will be fully supported
-    const result = wrapMethod(target, methodName, keyBeforeInstance, keyAfterInstance)
+    const result = wrapMethod(target, methodName, keyBeforeInstance, keyAfterInstance, meta =>
+      Reflect.construct(meta.target, meta.args, meta.ES6newTarget))
     result.prototype = target.prototype
     return result
-
   } else {
     const keyBeforeMethod = generateKey(KEY_BEFORE_METHOD, methodName)
     const keyAfterMethod = generateKey(KEY_AFTER_METHOD, methodName)
@@ -70,27 +68,25 @@ export function afterMethod<B = any, K extends keyof B = any> (...advices: Advic
 export function beforeInstance<B = any> (...advices: AdviceRef<B>[]): ClassSignature<B> {
   return function (target, methodName = "constructor") {
     const keyBeforeInstance = generateKey(KEY_BEFORE_INSTANCE, methodName)
-    target = applyReflect(
+    return applyReflect(
       target,
       advices,
       methodName,
       keyBeforeInstance,
       target
     )
-    return target
   }
 }
 
 export function afterInstance<B = any> (...advices: AdviceRef<B>[]): ClassSignature<B> {
   return function (target, methodName = "constructor") {
     const keyAfterInstance = generateKey(KEY_AFTER_INSTANCE, methodName)
-    target = applyReflect(
+    return applyReflect(
       target,
       advices,
       methodName,
       keyAfterInstance,
       target
     )
-    return target
   }
 }
