@@ -1,27 +1,35 @@
 ### Babel
 
-At first we did not support Babel because they drop support for decorators (year ago, by the time of writing)... nowadays they're going to fully implement this proposal, but still we're waiting...
+At first we did not support Babel because they drop support for decorators (year ago, by the time of writing)... nowadays they provide support under babel 6 [babel-plugin-transform-decorators-legacy](https://www.npmjs.com/package/babel-plugin-transform-decorators-legacy) or babel 7 [@babel/plugin-proposal-decorators](https://www.npmjs.com/package/@babel/plugin-proposal-decorators)
 
-Of course we're going to provide support for Babel users <span style="text-decoration: line-through">, but think that kaop-ts is intended to work with TypeScript</span>. If Babel team implements decorators proposal it will be good for us also. Please refer here: https://github.com/babel/proposals/issues/13
-
-You should have at least this `.babelrc` setup:
+I would recommend babel 7 with following `.babelrc` setup:
 
 ```
 {
-    "presets": [
-      "latest",
-      "stage-2"
-    ],
-    "plugins": ["transform-decorators-legacy"]
+  "presets": [["@babel/preset-env", {
+    "targets": {
+        <<<any es6 target>>>
+      }
+    }], "@babel/preset-stage-2"],
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", { "legacy": true }]
+  ]
 }
 ```
 [Motivation](https://github.com/k1r0s/kaop-ts/issues/9)
 
-### `IMetadata was not found in 'kaop-ts'`
+### Typescript
 
-This is due to an issue laying on TypeScript + Webpack + Angular.
+This is the minimal `tsconfig.json`.
 
-Check out the [reasons and workaround](https://github.com/k1r0s/kaop-ts/issues/5#issuecomment-305759257)
+```
+{
+    "compilerOptions": {
+      "target": "es6",
+      "experimentalDecorators": true
+    }
+}
+```
 
 ###  Do not reassign methods or use decorators on arrow functions (i.e.: public something = () => {})
 
