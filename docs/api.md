@@ -41,6 +41,7 @@ const myCustomAdvice = beforeMethod<MyComponent, 'ngOnInit'>(function() {
   meta.method // Original method
   meta.target // Class definition
   meta.result // The returned value by the method
+  meta.prevented // The main method was not executed, prevent() was called
   meta.exception // current exception (if any). The exception should be handled
   // using `meta.handle()` to avoid error to be thrown.
 
