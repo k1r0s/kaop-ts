@@ -84,7 +84,7 @@
     "validate-commit-msg": "^2.10.1"
   },
   "dependencies": {
-    "kaop": "^4.2.1",
+    "kaop": "^4.3.0",
     "reflect-metadata": "^0.1.12"
   }
 }

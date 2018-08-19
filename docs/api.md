@@ -47,6 +47,7 @@ const myCustomAdvice = beforeMethod<MyComponent, 'ngOnInit'>(function() {
 
   meta.commit() // triggers the next advice or method in the
   // call stack (mandatory if your advice contains async operations)
+  // if arguments are provided then it will be pushed to meta.args as kaop/issues/12
 
   meta.skip() // prevent execution of following advices until method execution
 
