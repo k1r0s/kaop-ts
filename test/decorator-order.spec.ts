@@ -1,10 +1,10 @@
 import { beforeMethod, afterMethod, afterInstance, beforeInstance } from "../src"
 
 const op1 = meta => meta.args[0]++
-const op2 = meta => meta.args[0] * 2
-const op3 = meta => meta.args[0] - 5
-const op4 = meta => meta.args[0] * 10
-const op5 = meta => meta.args[0] / 2
+const op2 = meta => meta.args[0] *= 2
+const op3 = meta => meta.args[0] -= 5
+const op4 = meta => meta.args[0] *= 10
+const op5 = meta => meta.args[0] /= 2
 
 @beforeInstance(op2)
 @beforeInstance(op1)

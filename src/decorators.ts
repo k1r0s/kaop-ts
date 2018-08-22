@@ -19,7 +19,7 @@ function wrapMethod (target, methodName, beforeKey, afterKey, caller?) {
 function applyReflect (target, advices, methodName, keyJoinPoint, original) {
   const keyOriginalMethod = generateKey(KEY_ORIGINAL_METHOD, methodName)
   const adviceArr = Reflect.getMetadata(keyJoinPoint, target) || []
-  adviceArr.push(...advices.map(reflect.advice))
+  adviceArr.unshift(...advices.map(reflect.advice))
   Reflect.defineMetadata(keyJoinPoint, adviceArr, target)
   if (!Reflect.getMetadata(keyOriginalMethod, target)) Reflect.defineMetadata(keyOriginalMethod, original, target)
 
