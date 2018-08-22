@@ -3,8 +3,8 @@ export interface Metadata<B> {
   scope: B,
   key: string,
   method: Function,
-  exception: undefined,
-  result: undefined,
+  exception: any,
+  result: any,
   prevented: undefined,
   target: Object,
   handle: Function,
@@ -19,10 +19,12 @@ export interface AdviceRef<B> {
 
 export interface MethodSignature<B, K> {
   (target: B, key: K, descriptor)
+  advices: () => AdviceRef<B>[]
 }
 
 export interface ClassSignature<B> {
   (target: B)
+  advices: () => AdviceRef<B>[]
 }
 
 export interface AspectBuilder {

@@ -1,5 +1,5 @@
 import { KEY_ORIGINAL_METHOD, KEY_BEFORE_METHOD, KEY_AFTER_METHOD, KEY_BEFORE_INSTANCE, KEY_AFTER_INSTANCE } from "./constants"
-import { AdviceRef, Metadata, MethodSignature, ClassSignature } from "./interfaces"
+import { AdviceRef, MethodSignature, ClassSignature } from "./interfaces"
 import { reflect } from "kaop"
 import "reflect-metadata"
 
@@ -38,7 +38,7 @@ function applyReflect (target, advices, methodName, keyJoinPoint, original) {
 }
 
 export function beforeMethod<B = any, K extends keyof B = any> (...advices: AdviceRef<B>[]): MethodSignature<B, K> {
-  return function (target, methodName, descriptor) {
+  return Object.assign((target, methodName, descriptor) => {
     const keyBeforeMethod = generateKey(KEY_BEFORE_METHOD, methodName)
     descriptor.value = applyReflect(
       target,
@@ -48,25 +48,25 @@ export function beforeMethod<B = any, K extends keyof B = any> (...advices: Advi
       descriptor.value
     )
     return descriptor
-  }
+  }, { advices: () => advices })
 }
 
 export function afterMethod<B = any, K extends keyof B = any> (...advices: AdviceRef<B>[]): MethodSignature<B, K> {
-  return function (target, methodName, descriptor) {
-    const keyAfterMethod = generateKey(KEY_AFTER_METHOD, methodName)
+  return Object.assign((target, methodName, descriptor) => {
+    const keyBeforeMethod = generateKey(KEY_AFTER_METHOD, methodName)
     descriptor.value = applyReflect(
       target,
       advices,
       methodName,
-      keyAfterMethod,
+      keyBeforeMethod,
       descriptor.value
     )
     return descriptor
-  }
+  }, { advices: () => advices })
 }
 
 export function beforeInstance<B = any> (...advices: AdviceRef<B>[]): ClassSignature<B> {
-  return function (target, methodName = "constructor") {
+  return Object.assign((target, methodName = "constructor") => {
     const keyBeforeInstance = generateKey(KEY_BEFORE_INSTANCE, methodName)
     return applyReflect(
       target,
@@ -75,11 +75,11 @@ export function beforeInstance<B = any> (...advices: AdviceRef<B>[]): ClassSigna
       keyBeforeInstance,
       target
     )
-  }
+  }, { advices: () => advices })
 }
 
 export function afterInstance<B = any> (...advices: AdviceRef<B>[]): ClassSignature<B> {
-  return function (target, methodName = "constructor") {
+  return Object.assign((target, methodName = "constructor") => {
     const keyAfterInstance = generateKey(KEY_AFTER_INSTANCE, methodName)
     return applyReflect(
       target,
@@ -88,5 +88,5 @@ export function afterInstance<B = any> (...advices: AdviceRef<B>[]): ClassSignat
       keyAfterInstance,
       target
     )
-  }
+  }, { advices: () => advices })
 }
