@@ -1,3 +1,29 @@
+### Catch decorator
+
+[npm package and usage](https://www.npmjs.com/package/awesome-catch-decorator)
+
+Code:
+
+```javascript
+import { afterMethod } from "kaop-ts";
+
+export default (errorType, fn = () => {}) => afterMethod(meta => {
+  if (meta.exception && meta.exception instanceof errorType) {
+    const exception = meta.handle();
+    meta.result = fn(exception);
+  } else if(meta.result && typeof meta.result.catch === "function") {
+    meta.result = meta.result.catch(exception => {
+      if (exception instanceof errorType) {
+        return fn(exception);
+      } else {
+        throw exception;
+      }
+    });
+  }
+});
+
+```
+
 ### Log decorator
 
 [npm package and usage](https://www.npmjs.com/package/decorator-log)
@@ -43,13 +69,13 @@ module.exports = {
 };
 ```
 
-### Preact scoped-stylesheet decorator
+### React/Preact scoped-stylesheet decorator
 
 [npm package](https://www.npmjs.com/package/stylesheet-decorator)
 
 Usage:
 
-![Styling Praect Components](https://pbs.twimg.com/media/DMHogfLXcAAqova.jpg)
+![Styling Preact Components](https://pbs.twimg.com/media/DMHogfLXcAAqova.jpg)
 
 Code:
 

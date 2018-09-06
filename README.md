@@ -88,6 +88,7 @@ someMethod() {
   (older version, API may defer)
   - [Working example about AOP/SRP with Angular 2+](https://github.com/k1r0s/angular2-srp-showcase)
   - [ES6 class constructor override ](https://github.com/k1r0s/babel-ts-es6-constructor-override)
+  - [Catch decorator](/docs/examples.md#catch-decorator)
   - [Log decorator implementation](/docs/examples.md#log-decorator)
   - [Http decorator using axios](/docs/examples.md#http-decorator)
   - [Preact scoped stylesheet decorator](/docs/examples.md#preact-scoped-stylesheet-decorator)
@@ -95,7 +96,8 @@ someMethod() {
 
 ### Resources
 
-
+- [Article series - Idiomatic JavaScript Backend - part 1/3 ](https://dev.to/k1r0s/idiomatic-javascript-backend-part-1-4g0b)
+- [Repo - based on Article series on dev.to](https://github.com/k1r0s/ritley-tutorial)
 - [Repo - AngularBeers (bcn) Separation of Concerns in modern JavaScript](https://github.com/k1r0s/angular-beers-dec19-separation-of-concerns)
 - [Video/Talk - AngularBeers (bcn) Separation of Concerns in modern JavaScript](https://www.youtube.com/watch?v=DPJSkpArYK0)
 - [Article about Angular2+, Decorators and SRP](https://hackernoon.com/angular-tutorial-separation-of-concerns-using-es7-decorators-ed6c9756265)
