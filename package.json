@@ -1,6 +1,6 @@
 {
   "name": "kaop-ts",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "",
   "keywords": [],
   "main": "dist/kaop-ts.umd.js",
@@ -27,6 +27,7 @@
     "report-coverage": "cat ./coverage/lcov.info | coveralls",
     "commit": "npm run lint && git-cz",
     "prepush": "npm run test:prod && npm run build",
+    "semantic-release": "semantic-release",
     "commitmsg": "validate-commit-msg"
   },
   "config": {
@@ -39,6 +40,7 @@
     }
   },
   "jest": {
+    "testEnvironment": "node",
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
@@ -76,6 +78,7 @@
     "rollup": "^0.66.0",
     "rollup-plugin-commonjs": "^9.0.0",
     "rollup-plugin-node-resolve": "^3.0.0",
+    "semantic-release": "^15.9.16",
     "ts-jest": "^23.0.0",
     "ts-node": "^7.0.0",
     "tslint": "^5.2.0",

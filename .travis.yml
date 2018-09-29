@@ -6,9 +6,6 @@ branches:
   only:
     - master
     - /^greenkeeper/.*$/
-cache:
-  directories:
-    - node_modules
 notifications:
   email: false
 node_js:
@@ -19,3 +16,4 @@ script:
   - npm run test:prod && npm run build
 after_success:
   - npm run report-coverage
+  - npm run semantic-release
