@@ -40,6 +40,7 @@
     }
   },
   "jest": {
+    "testEnvironment": "node",
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
@@ -67,7 +68,7 @@
   },
   "devDependencies": {
     "@types/jest": "^23.0.0",
-    "@types/node": "^10.0.3",
+    "@types/node": "^10.11.2",
     "commitizen": "^2.9.5",
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.0",
