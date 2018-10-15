@@ -53,12 +53,12 @@ export function beforeMethod<B = any, K extends keyof B = any> (...advices: Advi
 
 export function afterMethod<B = any, K extends keyof B = any> (...advices: AdviceRef<B>[]): MethodSignature<B, K> {
   return Object.assign((target, methodName, descriptor) => {
-    const keyBeforeMethod = generateKey(KEY_AFTER_METHOD, methodName)
+    const keyAfterMethod = generateKey(KEY_AFTER_METHOD, methodName)
     descriptor.value = applyReflect(
       target,
       advices,
       methodName,
-      keyBeforeMethod,
+      keyAfterMethod,
       descriptor.value
     )
     return descriptor
