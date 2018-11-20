@@ -149,5 +149,3 @@ class View {
   setPermission () { ... }
 }
 ```
-
-Be careful, since decorated methods with **async Advices** return `undefined`

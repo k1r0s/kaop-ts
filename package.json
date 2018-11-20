@@ -42,7 +42,7 @@
   "jest": {
     "testEnvironment": "node",
     "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".(ts|tsx)": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.ts$",
     "moduleFileExtensions": [
@@ -87,7 +87,7 @@
     "validate-commit-msg": "^2.10.1"
   },
   "dependencies": {
-    "kaop": "^4.3.0",
+    "kaop": "^4.4.1",
     "reflect-metadata": "^0.1.12"
   }
 }

@@ -35,10 +35,6 @@ This is the minimal `tsconfig.json`.
 
 kaop-ts uses metadata properties inside methods or classes. If you alter that references by reasignment you'll mess Advice call stack.
 
-###  Avoid async Advices with some frameworks functions (i.e.: React `render` function)
-
-Careful when adding async Advices to some frameworks functions, let's say `render` method of React component. In this case, the method will be evaluated as `undefined` messing up React rendering.
-
 ### Useful Tips
 
 > Join points decorators can be stacked and used sync or asynchronously.
@@ -48,7 +44,3 @@ Careful when adding async Advices to some frameworks functions, let's say `rende
 > You can prevent main method execution by calling `meta.prevent`.
 
 > Some contexts or metadata may be accessible in several cases. For example: trying to modify method arguments at `after` join point doesn't have any sense. *Maybe for communication purposes between advices*.
-
-> You should not perform async calls during `beforeInstance` join points because you will mess up instantiation of that class.
-
-> Async advices return 'undefined'
