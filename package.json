@@ -19,7 +19,7 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "lint": "tslint -t codeFrame src/**/*.ts test/**/*.ts",
+    "lint": "tslint -t codeFrame src/**/*.ts",
     "prebuild": "rm -rf dist",
     "build": "tsc && rollup -c && rm -rf compiled",
     "test": "jest",

@@ -7,40 +7,52 @@ function generateKey (scope, methodName) {
   return `${scope}-${methodName}`
 }
 
-function wrapMethod (target, methodName, beforeKey, afterKey, caller?) {
-  const keyOriginalMethod = generateKey(KEY_ORIGINAL_METHOD, methodName)
-  return reflect.createProxyFn(target, methodName, [
-    ...Reflect.getMetadata(beforeKey, target) || [],
-    Reflect.getMetadata(keyOriginalMethod, target),
-    ...Reflect.getMetadata(afterKey, target) || []
-  ], caller)
+function wrapMethod (target, methodName, original, befores, afters, caller?) {
+  const adviceList = [
+    ...(befores || []),
+    original,
+    ...(afters || [])
+  ]
+  return reflect.createProxyFn(target, methodName, adviceList, caller)
 }
 
-function applyReflect (target, advices, methodName, keyJoinPoint, original) {
-  const keyOriginalMethod = generateKey(KEY_ORIGINAL_METHOD, methodName)
-  const adviceArr = Reflect.getMetadata(keyJoinPoint, target) || []
+function replace (target, metaContainer, advices, methodName, keyJoinPoint, original) {
+  const adviceArr = Reflect.getMetadata(keyJoinPoint, metaContainer) || []
   adviceArr.unshift(...advices.map(reflect.advice))
-  Reflect.defineMetadata(keyJoinPoint, adviceArr, target)
-  if (!Reflect.getMetadata(keyOriginalMethod, target)) Reflect.defineMetadata(keyOriginalMethod, original, target)
+  Reflect.defineMetadata(keyJoinPoint, adviceArr, metaContainer)
+
+  const keyOriginalMethod = generateKey(KEY_ORIGINAL_METHOD, methodName)
+  if (!Reflect.getMetadata(keyOriginalMethod, metaContainer)) {
+    Reflect.defineMetadata(keyOriginalMethod, original, metaContainer)
+  }
+  const originalMethod = Reflect.getMetadata(keyOriginalMethod, metaContainer)
 
   if (methodName === "constructor") {
-    const keyBeforeInstance = generateKey(KEY_BEFORE_INSTANCE, methodName)
-    const keyAfterInstance = generateKey(KEY_AFTER_INSTANCE, methodName)
-    const result = wrapMethod(target, methodName, keyBeforeInstance, keyAfterInstance, meta =>
-      Reflect.construct(meta.target, meta.args, meta.ES6newTarget))
-    result.prototype = target.prototype
-    return result
+    const keyBeforeMethod = generateKey(KEY_BEFORE_INSTANCE, methodName)
+    const keyAfterMethod = generateKey(KEY_AFTER_INSTANCE, methodName)
+    const beforeAdvices = Reflect.getMetadata(keyBeforeMethod, metaContainer)
+    const afterAdvices = Reflect.getMetadata(keyAfterMethod, metaContainer)
+
+    const nctor = wrapMethod(target, methodName, originalMethod, beforeAdvices, afterAdvices, meta =>
+      Reflect.construct(meta.target.prototype.constructor, meta.args, meta.ES6newTarget))
+
+    nctor.prototype = target.prototype
+    return nctor
   } else {
     const keyBeforeMethod = generateKey(KEY_BEFORE_METHOD, methodName)
     const keyAfterMethod = generateKey(KEY_AFTER_METHOD, methodName)
-    return wrapMethod(target, methodName, keyBeforeMethod, keyAfterMethod)
+    const beforeAdvices = Reflect.getMetadata(keyBeforeMethod, metaContainer)
+    const afterAdvices = Reflect.getMetadata(keyAfterMethod, metaContainer)
+
+    return wrapMethod(target, methodName, originalMethod, beforeAdvices, afterAdvices)
   }
 }
 
 export function beforeMethod<B = any, K extends keyof B = any> (...advices: AdviceRef<B>[]): MethodSignature<B, K> {
   return Object.assign((target, methodName, descriptor) => {
     const keyBeforeMethod = generateKey(KEY_BEFORE_METHOD, methodName)
-    descriptor.value = applyReflect(
+    descriptor.value = replace(
+      target,
       target,
       advices,
       methodName,
@@ -54,7 +66,8 @@ export function beforeMethod<B = any, K extends keyof B = any> (...advices: Advi
 export function afterMethod<B = any, K extends keyof B = any> (...advices: AdviceRef<B>[]): MethodSignature<B, K> {
   return Object.assign((target, methodName, descriptor) => {
     const keyAfterMethod = generateKey(KEY_AFTER_METHOD, methodName)
-    descriptor.value = applyReflect(
+    descriptor.value = replace(
+      target,
       target,
       advices,
       methodName,
@@ -68,12 +81,13 @@ export function afterMethod<B = any, K extends keyof B = any> (...advices: Advic
 export function beforeInstance<B = any> (...advices: AdviceRef<B>[]): ClassSignature<B> {
   return Object.assign((target, methodName = "constructor") => {
     const keyBeforeInstance = generateKey(KEY_BEFORE_INSTANCE, methodName)
-    return applyReflect(
+    return replace(
       target,
+      target.prototype,
       advices,
       methodName,
       keyBeforeInstance,
-      target
+      target.prototype.constructor
     )
   }, { advices: () => advices })
 }
@@ -81,12 +95,13 @@ export function beforeInstance<B = any> (...advices: AdviceRef<B>[]): ClassSigna
 export function afterInstance<B = any> (...advices: AdviceRef<B>[]): ClassSignature<B> {
   return Object.assign((target, methodName = "constructor") => {
     const keyAfterInstance = generateKey(KEY_AFTER_INSTANCE, methodName)
-    return applyReflect(
+    return replace(
       target,
+      target.prototype,
       advices,
       methodName,
       keyAfterInstance,
-      target
+      target.prototype.constructor
     )
   }, { advices: () => advices })
 }
