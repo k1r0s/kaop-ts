@@ -89,9 +89,9 @@ someMethod() {
   - [Working example about AOP/SRP with Angular 2+](https://github.com/k1r0s/angular2-srp-showcase)
   - [ES6 class constructor override ](https://github.com/k1r0s/babel-ts-es6-constructor-override)
   - [Catch decorator](/docs/examples.md#catch-decorator)
-  - [Log decorator implementation](/docs/examples.md#log-decorator)
+  - [Log decorator implementation](/docs/examples.md#logging)
   - [Http decorator using axios](/docs/examples.md#http-decorator)
-  - [Preact scoped stylesheet decorator](/docs/examples.md#preact-scoped-stylesheet-decorator)
+  - [Preact scoped stylesheet decorator](/docs/examples.md#scoped-stylesheet-decorator)
 
 
 ### Resources

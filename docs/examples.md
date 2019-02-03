@@ -1,113 +1,89 @@
+### Logging
+
+sample code:
+
+```javascript
+import { Log } from "./your-log-decorator";
+import { beforeMethod } from "kaop-ts";
+
+class ClassName {
+
+  @beforeMethod(Log)
+  someMethod() {
+    ...
+  }
+}
+
+```
+
 ### Catch decorator
 
 [npm package and usage](https://www.npmjs.com/package/awesome-catch-decorator)
 
-Code:
+sample code:
 
 ```javascript
-import { afterMethod } from "kaop-ts";
+import Catch from "awesome-catch-decorator"
 
-export default (errorType, fn = () => {}) => afterMethod(meta => {
-  if (meta.exception && meta.exception instanceof errorType) {
-    const exception = meta.handle();
-    meta.result = fn(exception);
-  } else if(meta.result && typeof meta.result.catch === "function") {
-    meta.result = meta.result.catch(exception => {
-      if (exception instanceof errorType) {
-        return fn(exception);
-      } else {
-        throw exception;
-      }
-    });
+class AnyES6Class {
+  @Catch(SyntaxError, () => ({}))
+  static parseResponse(unvalidatedInputValue) {
+    return JSON.parse(unvalidatedInputValue)
   }
-});
+}
 
-```
-
-### Log decorator
-
-[npm package and usage](https://www.npmjs.com/package/decorator-log)
-
-Code:
-
-```javascript
-import { afterMethod } from "kaop-ts";
-
-export const Log = afterMethod(function(meta){
-  const methodName = `${meta.target.constructor.name}::${meta.key}`;
-  console.info(`log-decorator: ${methodName} invoked!`);
-  console.info(`log-decorator: ${methodName} arguments -> `, meta.args);
-  console.info(`log-decorator: ${methodName} result -> `, meta.result);
-});
+// will always return an object
+AnyES6Class.parseResponse()
+AnyES6Class.parseResponse(",,,s,ds,sd,")
+AnyES6Class.parseResponse('{ "message": "Okay, I get it" }')
 ```
 
 ### Http decorator
 
 [npm package and usage](https://www.npmjs.com/package/http-decorator)
 
-Code:
+package it self is a bit outdated but u get the basic idea:
 
-```javascript
-const axios = require('axios');
-const { beforeMethod } = require('kaop-ts');
+sample code:
 
-module.exports = {
-  http: ({ method = 'get', ...options }) =>
-  beforeMethod(function(meta){
-    const [params] = meta.args;
-    options[method === 'get' ? 'params' : 'data'] = params;
-    axios({ method, ...options })
-    .then(res => {
-      meta.args = [params, null, res.data];
-      this.next();
-    })
-    .catch(error => {
-      meta.args = [params, error, null];
-      this.next();
-    })
-  })
-};
+```typescript
+
+class SomeClass {
+  @http({ url: 'localhost/resource'})
+  public someMethod (params?: any, error?, result?): void {
+    // error should be null if request was success
+  }
+}
+
+someClassInstance.someMethod()
+// $ curl localhost/resource
+someClassInstance.someMethod({ id: 1 })
+// $ curl localhost/resource?id=1
+
+const prom:Promise<any> = someClassInstance.someMethod()
+
 ```
 
-### React/Preact scoped-stylesheet decorator
+### Scoped-stylesheet decorator
 
-[npm package](https://www.npmjs.com/package/stylesheet-decorator)
+[React/Preact npm package](https://www.npmjs.com/package/stylesheet-decorator)
 
 Usage:
 
 ![Styling Preact Components](https://pbs.twimg.com/media/DMHogfLXcAAqova.jpg)
 
-Code:
+sample code:
 
-```javascript
-import { h } from "preact";
-import { afterMethod } from "kaop-ts";
-import decamelize from "decamelize";
-import scope from "scope-css";
+```jsx
+const style = `
+  span { font-size: 20px; color: lightblue; }
+`
 
-export const stylesheet = (styleContent) =>
-afterMethod((meta) => {
-
-  // create vnode stylesheet only once
-  if(!meta.scope.__stylesheetVNode){
-    meta.scope.__stylesheetTagName = decamelize(meta.target.constructor.name, "-");
-
-    // remove all spaces, eols
-    styleContent = styleContent.replace(/(\r\n\s|\n|\r|\s)/gm, "");
-
-    // prefix all selectors to make stylesheet 'scoped' using scope-css package
-    styleContent = scope(styleContent, meta.scope.__stylesheetTagName);
-
-    // save a reference of the stylesheet within the class instance
-    meta.scope.__stylesheetVNode = h("style", { scoped: true }, styleContent);
+class ClassName {
+  @stylesheet(style)
+  render() {
+    return <span>something</span>
   }
-
-  // wrap rendered vnode with another
-  meta.result = h(
-    meta.scope.__stylesheetTagName, null,
-    [ meta.result, meta.scope.__stylesheetVNode ]
-  );
-
-});
+}
 
 ```
