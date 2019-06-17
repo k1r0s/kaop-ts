@@ -1,11 +1,8 @@
 import { KEY_ORIGINAL_METHOD, KEY_BEFORE_METHOD, KEY_AFTER_METHOD, KEY_BEFORE_INSTANCE, KEY_AFTER_INSTANCE } from "./constants"
 import { AdviceRef, MethodSignature, ClassSignature } from "./interfaces"
 import { reflect } from "kaop"
+import { generateKey } from "./clear"
 import "reflect-metadata"
-
-function generateKey (scope, methodName) {
-  return `${scope}-${methodName}`
-}
 
 function wrapMethod (target, methodName, original, befores, afters, caller?) {
   const adviceList = [
