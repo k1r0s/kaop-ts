@@ -73,7 +73,7 @@
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.0",
     "cz-conventional-changelog": "^2.0.0",
-    "husky": "^1.1.0",
+    "husky": "^3.0.7",
     "jest": "^22.0.0",
     "rollup": "^1.0.0",
     "rollup-plugin-commonjs": "^9.0.0",
