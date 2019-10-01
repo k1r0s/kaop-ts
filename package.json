@@ -71,7 +71,7 @@
     "@types/node": "^10.11.4",
     "commitizen": "^3.0.0",
     "coveralls": "^3.0.0",
-    "cross-env": "^5.0.0",
+    "cross-env": "^6.0.2",
     "cz-conventional-changelog": "^2.0.0",
     "husky": "^1.1.0",
     "jest": "^22.0.0",
