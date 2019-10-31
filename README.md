@@ -32,9 +32,11 @@ Use a [join point](/docs/api.md#available-join-points) to plug it to any method/
 ```javascript
 import { afterMethod } from 'kaop-ts'
 
+const double = afterMethod(meta => meta.result *= 2)
+
 class DummyExample {
 
-  @afterMethod(meta => meta.result *= 2)
+  @double
   static calculateSomething (num, num2) {
     return num * num2
   }
