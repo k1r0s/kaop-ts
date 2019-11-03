@@ -82,7 +82,7 @@
     "ts-jest": "^23.10.4",
     "ts-node": "^7.0.0",
     "tslint": "^5.2.0",
-    "tslint-config-standard": "^8.0.0",
+    "tslint-config-standard": "^9.0.0",
     "typescript": "^2.9.2",
     "validate-commit-msg": "^2.10.1"
   },
