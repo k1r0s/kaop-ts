@@ -75,7 +75,7 @@
     "cz-conventional-changelog": "^2.0.0",
     "husky": "^1.1.0",
     "jest": "^22.0.0",
-    "rollup": "^1.0.0",
+    "rollup": "^1.27.8",
     "rollup-plugin-commonjs": "^9.0.0",
     "rollup-plugin-node-resolve": "^5.0.0",
     "semantic-release": "^15.9.16",
